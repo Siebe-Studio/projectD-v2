@@ -1,5 +1,5 @@
 import Image from "next/image";
-import SignInButton from "@/app/components/auth/SignInButton";
+import SignInButton from "@/components/auth/SignInButton";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/route";
 
