@@ -33,6 +33,10 @@ export class JwtGuard implements CanActivate {
 
     const roles = this.reflector.get<string[]>('roles', context.getHandler());
 
+    if(payload.role === 'ADMIN'){
+      return true;
+    }
+
     if(roles && roles.includes(payload.role)){
       return true;
     }
