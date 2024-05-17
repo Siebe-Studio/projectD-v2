@@ -23,4 +23,21 @@ export class CategoryService {
       },
     });
   }
+
+  async update(id: number, data: Prisma.CategoryUpdateInput): Promise<Category> {
+    return this.prisma.category.update({
+      where: {
+        id,
+      },
+      data,
+    });
+  }
+
+  async delete(id: number): Promise<Category> {
+    return this.prisma.category.delete({
+      where: {
+        id,
+      },
+    });
+  }
 }
