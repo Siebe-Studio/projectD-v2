@@ -208,7 +208,9 @@ export default function Dashboard() {
                 Je kan beginnen met het managen van je voorraad door producten
                 toe te voegen.
               </p>
-              <Button className="mt-4">Product toevoegen</Button>
+              <Button className="mt-4" onClick={() => navigate("/products")}>
+  	            Product toevoegen
+  	          </Button>
             </div>
           </div>
         </main>
