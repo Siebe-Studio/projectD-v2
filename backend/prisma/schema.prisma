@@ -30,7 +30,7 @@ model Product {
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id])
 
-  item Item[]
+  items Item[]
 }
 
 model Item {

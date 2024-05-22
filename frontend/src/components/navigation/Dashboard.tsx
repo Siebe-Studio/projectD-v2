@@ -34,7 +34,7 @@ const Allowed = {
 }
 
 
-export default function Dashboard() {
+export default function Dashboard({ children} : { children: React.ReactNode}) {
   const { data: session } = useSession();
   console.log(session);
 
@@ -79,7 +79,7 @@ export default function Dashboard() {
                 </Badge>
               </Link>
               <Link
-                href="#"
+                href="producten"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-primary transition-all hover:text-primary"
               >
                 <Package className="h-4 w-4" />
@@ -193,23 +193,11 @@ export default function Dashboard() {
           </SheetContent>
         </Sheet>
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
-          <div className="flex items-center">
-            <h1 className="text-lg font-semibold md:text-2xl">Inventaris</h1>
-          </div>
           <div
             className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm"
             x-chunk="dashboard-02-chunk-1"
           >
-            <div className="flex flex-col items-center gap-1 text-center">
-              <h3 className="text-2xl font-bold tracking-tight">
-                Je hebt nog geen producten.
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Je kan beginnen met het managen van je voorraad door producten
-                toe te voegen.
-              </p>
-              <Button className="mt-4">Product toevoegen</Button>
-            </div>
+            {children}
           </div>
         </main>
       </div>
