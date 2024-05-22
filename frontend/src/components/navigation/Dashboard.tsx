@@ -119,7 +119,7 @@ export default function Dashboard() {
                 <DropdownMenuItem>Instellingen</DropdownMenuItem>
                 <DropdownMenuItem>Support</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Uitloggen</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => signOut()}>Uitloggen</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             <p className="text-muted-foreground text-sm">

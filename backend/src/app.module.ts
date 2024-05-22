@@ -9,9 +9,10 @@ import { CategoryController } from './category/category.controller';
 import { CategoryModule } from './category/category.module';
 import { CategoryService } from './category/category.service';
 import { JwtService } from '@nestjs/jwt';
+import { ItemModule } from './item/item.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UserModule, AuthModule, CategoryModule],
+  imports: [ConfigModule.forRoot(), UserModule, AuthModule, CategoryModule, ItemModule],
   controllers: [AppController, CategoryController],
   providers: [AppService, PrismaService, JwtService, CategoryService],
 })
