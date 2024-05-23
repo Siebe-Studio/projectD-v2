@@ -36,90 +36,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-// const data: Payment[] = [
-//   {
-//     id: "m5gr84i9",
-//     amount: 316,
-//     status: "success",
-//     email: "ken99@yahoo.com",
-//   },
-//   {
-//     id: "3u1reuv4",
-//     amount: 242,
-//     status: "success",
-//     email: "Abe45@gmail.com",
-//   },
-//   {
-//     id: "derv1ws0",
-//     amount: 837,
-//     status: "processing",
-//     email: "Monserrat44@gmail.com",
-//   },
-//   {
-//     id: "5kma53ae",
-//     amount: 874,
-//     status: "success",
-//     email: "Silas22@gmail.com",
-//   },
-//   {
-//     id: "bhqecj4p",
-//     amount: 721,
-//     status: "failed",
-//     email: "carmella@hotmail.com",
-//   },
-// ]
-
-export type Payment = {
-  id: string;
-  amount: number;
-  status: "pending" | "processing" | "success" | "failed";
-  email: string;
-};
-
-const data: Product[] = [
-  {
-    id: 1,
-    name: "Warmtepomp XYZ",
-    description: "max temp 40 graden",
-    price: 2999,
-    categoryId: 1,
-    category: {
-      id: 1,
-      name: "Warmtepompen",
-    },
-    _count: {
-      items: 14,
-    },
-  },
-  {
-    id: 2,
-    name: "Warmtepomp XYZ",
-    description: "max temp 40 graden",
-    price: 2999,
-    categoryId: 1,
-    category: {
-      id: 1,
-      name: "Warmtepompen",
-    },
-    _count: {
-      items: 1,
-    },
-  },
-  {
-    id: 3,
-    name: "Slimme meter XYZ",
-    description: "max temp 40 graden",
-    price: 300,
-    categoryId: 1,
-    category: {
-      id: 1,
-      name: "Slimme meters",
-    },
-    _count: {
-      items: 14,
-    },
-  },
-];
+import Link from "next/link";
 
 export type Product = {
   id: number;
@@ -244,11 +161,10 @@ export const columns: ColumnDef<Product>[] = [
               Kopieer product ID
             </DropdownMenuItem>
             <DropdownMenuItem
-              onClick={() =>
-                navigator.clipboard.writeText(product.id.toString())
-              }
             >
-              Bekijk product
+                <Link href={`/producten/${product.id}`}>
+                    Bekijk product
+                </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </DropdownMenuContent>
