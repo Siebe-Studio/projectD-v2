@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -8,8 +16,16 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Post()
-  create(@Body() createProductDto: any) {
-    return this.productService.create(createProductDto);
+  create(
+    @Body()
+    data: {
+      name: string;
+      description?: string;
+      price: number;
+      categoryId: number;
+    },
+  ) {
+    return this.productService.create(data);
   }
 
   @Get()

@@ -37,8 +37,8 @@ export class CategoryController {
   }
 
   @Get()
-  @Roles('STOCKMANAGER')
-  @UseGuards(JwtGuard)
+  // @Roles('STOCKMANAGER')
+  // @UseGuards(JwtGuard)
   async getCategories() {
     return await this.categoryService.findAll();
   }

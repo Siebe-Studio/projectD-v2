@@ -3,23 +3,14 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { ProductTable } from "@/components/products/ProductTable";
+import AddProductDialog from "@/components/products/AddProductDialog";
 
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -48,14 +39,24 @@ export default function Products() {
   }, []);
 
   return (
-    <main className="flex flex-col w-full h-full p-4">
+    <main className="flex flex-col w-full h-full max-h-full p-4 gap-6">
+      <div className="flex w-fi">
+        <Card>
+          <CardHeader>
+            <CardTitle>Product toevoegen</CardTitle>
+          </CardHeader>
+            <CardContent>
+                <AddProductDialog/>
+            </CardContent>
+        </Card>
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>Producten</CardTitle>
           <CardDescription>Overzicht van alle producten</CardDescription>
         </CardHeader>
         <CardContent>
-            <ProductTable data={products}/>
+          <ProductTable data={products} />
         </CardContent>
       </Card>
     </main>
