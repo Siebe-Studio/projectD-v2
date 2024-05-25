@@ -18,6 +18,12 @@ const data: Payment[] = [
     description: "Niet van toepassing",
     location: "Rotterdam"
   },
+  {
+    id: "m13bvfceh",
+    plate: "12XZ32",
+    description: "None",
+    location: "Amsterdam"
+  }
 ]
 
 export type Payment = {
@@ -40,37 +46,29 @@ export const columns: ColumnDef<Payment>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "status",
-    header: "Status",
+    accessorKey: "plate",
+    header: "Plate",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
+      <div className="capitalize">{row.getValue("plate")}</div>
     ),
   },
   {
-    accessorKey: "product",
+    accessorKey: "location",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>Products
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>Locations
          <ArrowDownUp className="ml-2 h-4 w-4" />
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("product")}</div>,
+    cell: ({ row }) => <div>{row.getValue("location")}</div>,
   },
   {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"))
-
-      // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-      }).format(amount)
-
-      return <div className="text-right font-medium">{formatted}</div>
-    },
+    accessorKey: "description",
+    header: "Description",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("description")}</div>
+    ),
   },
   {
     id: "actions",

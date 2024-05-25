@@ -14,24 +14,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 const data: Payment[] = [
   {
     id: "m5gr84i9",
-    amount: 31,
-    product: "Pomp",
     phone: "+31 0612345678",
-    location: "Rotterdam",
+    location: "Schiedam",
     address: "Wijnhaven 107"
   },
   {
     id: "3u1reuv4",
-    amount: 22,
-    product: "Pomp",
     phone: "+31 0687654321",
-    location: "Rotterdam",
+    location: "Amsterdam",
     address: "Wijnhaven 108"
   },
   {
     id: "3u1reuv4",
-    amount: 70,
-    product: "Slang",
     phone: "+31 0687654321",
     location: "Rotterdam",
     address: "Wijnhaven 108"
@@ -40,8 +34,6 @@ const data: Payment[] = [
 
 export type Payment = {
   id: string
-  amount: number
-  product: string
   phone: string
   location: string
   address: string
@@ -60,13 +52,6 @@ export const columns: ColumnDef<Payment>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "location",
-    header: "Location",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("location")}</div>
-    ),
-  },
-  {
     accessorKey: "address",
     header: "Address",
     cell: ({ row }) => (
@@ -74,15 +59,15 @@ export const columns: ColumnDef<Payment>[] = [
     ),
   },
   {
-    accessorKey: "product",
+    accessorKey: "location",
     header: ({ column }) => {
       return (
-        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>Products
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>Locations
          <ArrowDownUp className="ml-2 h-4 w-4" />
         </Button>
       )
     },
-    cell: ({ row }) => <div className="lowercase">{row.getValue("product")}</div>,
+    cell: ({ row }) => <div>{row.getValue("location")}</div>,
   },
   {
     accessorKey: "phone",
@@ -90,18 +75,6 @@ export const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => (
       <div className="capitalize">{row.getValue("phone")}</div>
     ),
-  },
-  {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("amount"))
-
-      // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat("en-US").format(amount)
-
-      return <div className="text-right font-medium">{formatted}</div>
-    },
   },
   {
     id: "actions",
