@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { ArrowDownUp } from "lucide-react"
+import { ArrowDownUp, EllipsisVertical, Filter } from "lucide-react"
 import { ColumnDef, ColumnFiltersState, SortingState, VisibilityState, flexRender, 
         getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table"
 import { Button } from "@/components/ui/button"
@@ -10,19 +10,22 @@ import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMe
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import Link from "next/link";
 
 const data: Payment[] = [
   {
     id: "m5gr84i9",
     plate: "12XY34",
     description: "Niet van toepassing",
-    location: "Rotterdam"
+    location: "Rotterdam",
+    address: "Wijhaven 105"
   },
   {
     id: "m13bvfceh",
     plate: "12XZ32",
     description: "None",
-    location: "Amsterdam"
+    location: "Amsterdam",
+    address: "Wijhaven 102"
   }
 ]
 
@@ -31,6 +34,7 @@ export type Payment = {
   plate: string
   description: string
   location: string
+  address: string
 }
 
 export const columns: ColumnDef<Payment>[] = [
@@ -46,13 +50,6 @@ export const columns: ColumnDef<Payment>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "plate",
-    header: "Plate",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("plate")}</div>
-    ),
-  },
-  {
     accessorKey: "location",
     header: ({ column }) => {
       return (
@@ -64,6 +61,20 @@ export const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => <div>{row.getValue("location")}</div>,
   },
   {
+    accessorKey: "address",
+    header: "Address",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("address")}</div>
+    ),
+  },
+  {
+    accessorKey: "plate",
+    header: "Plate",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("plate")}</div>
+    ),
+  },
+  {
     accessorKey: "description",
     header: "Description",
     cell: ({ row }) => (
@@ -72,6 +83,7 @@ export const columns: ColumnDef<Payment>[] = [
   },
   {
     id: "actions",
+    header: "Options",
     enableHiding: false,
     cell: ({ row }) => {
       const payment = row.original
@@ -81,15 +93,15 @@ export const columns: ColumnDef<Payment>[] = [
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
               <span className="sr-only">Open menu</span>
-            {/*  <DotsHorizontalIcon className="h-4 w-4" /> */}
+              <EllipsisVertical className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}> Copy payment ID </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>View customer</DropdownMenuItem>
-            <DropdownMenuItem>View payment details</DropdownMenuItem>
+            <DropdownMenuItem><Link href={`/locations/${payment.id}`}>View Vehicle</Link></DropdownMenuItem>
+            <DropdownMenuSeparator/>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.plate)}> Copy vehicle Plate</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}> Copy vehicle ID</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
@@ -134,7 +146,7 @@ export function VehiclesDataTable() {
               className="max-w-sm"/>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="ml-auto">Filter {/*<ChevronDown className="ml-2 h-4 w-4"/>*/}</Button>
+                <Button variant="outline" className="ml-auto">Filter<Filter className="ml-2 h-4 w-4"/></Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 {table.getAllColumns().filter((column) => column.getCanHide()).map((column) => {
