@@ -14,9 +14,9 @@ import {
   CircleUser,
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/products/ui/badge";
+import { Button } from "@/components/products/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/products/ui/sheet";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,7 +24,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/components/products/ui/dropdown-menu";
 
 
 const Allowed = {
@@ -98,6 +98,13 @@ export default function Dashboard({ children} : { children: React.ReactNode}) {
               >
                 <LineChart className="h-4 w-4" />
                 Analytica
+              </Link>
+              <Link
+                href="/vehicles"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              >
+                <Bus className="h-4 w-4" />
+                Voertuigen
               </Link>
             </nav>
           </div>
@@ -188,7 +195,14 @@ export default function Dashboard({ children} : { children: React.ReactNode}) {
               >
                 <LineChart className="h-5 w-5" />
                 Analytics
-              </Link>
+                </Link>
+              <Link
+                href="/analytica"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+              >
+                <LineChart className="h-4 w-4" />
+                Analytica
+             </Link>
             </nav>
           </SheetContent>
         </Sheet>

@@ -11,9 +11,10 @@ import { CategoryService } from './category/category.service';
 import { JwtService } from '@nestjs/jwt';
 import { ItemModule } from './item/item.module';
 import { ProductModule } from './product/product.module';
+import { VehicleModule } from './vehicle/vehicle.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UserModule, AuthModule, CategoryModule, ItemModule, ProductModule],
+  imports: [ConfigModule.forRoot(), UserModule, AuthModule, CategoryModule, ItemModule, ProductModule, VehicleModule],
   controllers: [AppController, CategoryController],
   providers: [AppService, PrismaService, JwtService, CategoryService],
 })

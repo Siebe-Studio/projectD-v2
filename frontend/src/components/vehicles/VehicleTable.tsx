@@ -15,8 +15,8 @@ import {
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
 
-import { Button } from "@/components/products/ui/button";
-import { Checkbox } from "@/components/products/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -25,8 +25,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/products/ui/dropdown-menu";
-import { Input } from "@/components/products/ui/input";
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -34,26 +34,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/products/ui/table";
+} from "@/components/ui/table";
 
-import Link from "next/link";
-
-export type Product = {
+export type Vehicle = {
   id: number;
-  name: string;
+  location_id: number;
+  plate: string;
   description: string;
-  price: number;
-  categoryId: number;
-  category: {
-    id: number;
-    name: string;
-  };
-  _count: {
-    items: number;
-  };
 };
 
-export const columns: ColumnDef<Product>[] = [
+export const columns: ColumnDef<Vehicle>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -82,66 +72,25 @@ export const columns: ColumnDef<Product>[] = [
     cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "Naam",
-    accessorFn: (product) => product.name,
-    header: "Naam",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("Naam")}</div>,
+    accessorKey: "location_id",
+    header: "Location ID",
+    cell: ({ row }) => <div className="capitalize">{row.getValue("location_id")}</div>,
   },
   {
-    accessorKey: "Categorie",
-    accessorFn: (product) => product.category.name,
-    header: "Categorie",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("Categorie")}</div>,
+    accessorKey: "plate",
+    header: "Plaat",
+    cell: ({ row }) => <div className="capitalize">{row.getValue("plate")}</div>,
   },
   {
-    accessorKey: "items",
-    accessorFn: (product) => product._count.items,
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          SKU
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="ml-[10%] text-left">{row.getValue("items")}</div>
-    ),
-  },
-  {
-    accessorKey: "Prijs",
-    accessorFn: (product) => product.price,
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Prijs
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("Prijs"));
-
-      // Format the amount as a dollar amount
-      const formatted = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "EUR",
-      }).format(amount);
-
-      return <div className="text-left font-medium">{formatted}</div>;
-    },
+    accessorKey: "description",
+    header: "Beschrijving",
+    cell: ({ row }) => <div className="capitalize">{row.getValue("description")}</div>,
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const product = row.original;
+      const vehicle = row.original;
 
       return (
         <DropdownMenu>
@@ -155,16 +104,10 @@ export const columns: ColumnDef<Product>[] = [
             <DropdownMenuLabel>Acties</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() =>
-                navigator.clipboard.writeText(product.id.toString())
+                navigator.clipboard.writeText(vehicle.id.toString())
               }
             >
-              Kopieer product ID
-            </DropdownMenuItem>
-            <DropdownMenuItem
-            >
-                <Link href={`/producten/${product.id}`}>
-                    Bekijk product
-                </Link>
+              Kopieer voertuig ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </DropdownMenuContent>
@@ -174,7 +117,7 @@ export const columns: ColumnDef<Product>[] = [
   },
 ];
 
-export function ProductTable({ data }: { data: Product[] }) {
+export function VehicleTable({ data }: { data: Vehicle[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -206,10 +149,10 @@ export function ProductTable({ data }: { data: Product[] }) {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Zoek product op naam..."
-          value={(table.getColumn("Naam")?.getFilterValue() as string) ?? ""}
+          placeholder="Zoek voertuig op plaat..."
+          value={(table.getColumn("plate")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("Naam")?.setFilterValue(event.target.value)
+            table.getColumn("plate")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
@@ -283,7 +226,7 @@ export function ProductTable({ data }: { data: Product[] }) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  Geen resultaten.
                 </TableCell>
               </TableRow>
             )}

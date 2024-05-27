@@ -6,14 +6,14 @@ import { useState, useEffect } from "react";
 import { ProductTable } from "@/components/products/ProductTable";
 import AddProductDialog from "@/components/products/AddProductDialog";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/products/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/products/ui/card";
 
 export default function Products() {
   const { data: session } = useSession();
