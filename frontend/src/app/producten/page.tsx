@@ -1,40 +1,44 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import AddProductDialog from "@/components/products/AddProductDialog";
-import { ProductTable } from "@/components/products/ProductTable"; // Ensure you're using the named export
+"use client";
 
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
+import { ProductTable, Product } from "@/components/products/ProductTable"; // Import the Product type
+import AddProductDialog from "@/components/products/AddProductDialog";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import ProductDetails from "@/components/products/ProductDetail";
 export default function Products() {
-  const [products, setProducts] = useState<any[]>([]);
+  const { data: session } = useSession();
+  const [products, setProducts] = useState<Product[]>([]); // Use Product type here
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/api/products", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await response.json();
-        if (Array.isArray(data)) {
+    fetch("http://localhost:8000/product", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data) {
           setProducts(data);
-        } else {
-          setError("Invalid data format");
+          console.log(data);
         }
-      } catch (error) {
-        setError("Failed to fetch products");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
     <main className="flex flex-col w-full h-full max-h-full p-4 gap-6">
-      <div className="flex w-full">
+      <div className="flex w-fi">
         <Card>
           <CardHeader>
             <CardTitle>Product toevoegen</CardTitle>
@@ -48,17 +52,13 @@ export default function Products() {
         <CardHeader>
           <CardTitle>Producten</CardTitle>
           <CardDescription>Overzicht van alle producten</CardDescription>
-        </CardHeader>
+          </CardHeader>
         <CardContent>
-          {loading ? (
-            <p>Loading...</p>
-          ) : error ? (
-            <p>{error}</p>
-          ) : (
-            <ProductTable data={products} />
-          )}
+          <ProductTable data={products} />
         </CardContent>
       </Card>
+      {/* Render ProductDetails component with a productId */}
+      <ProductDetails productId={1} /> {/* Replace 1 with the actual product ID */}
     </main>
   );
 }

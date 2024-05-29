@@ -72,7 +72,7 @@ const dummyProducts: Product[] = [
     category: { id: 2, name: "Dummy Category 2" },
     _count: { items: 5 },
   },
-  
+  // Add more dummy products as needed
 ];
 
 export const columns: ColumnDef<Product>[] = [

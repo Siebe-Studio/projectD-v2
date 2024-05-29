@@ -19,10 +19,18 @@ export class ProductController {
   create(
     @Body()
     data: {
+      id: number,
       name: string;
       description?: string;
       price: number;
       categoryId: number;
+      Category: { // Use Category with a capital letter
+        id: number;
+        name: string;
+      };
+      _count: {
+        items: number;
+      };
     },
   ) {
     return this.productService.create(data);
