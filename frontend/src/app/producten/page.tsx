@@ -12,12 +12,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import ProductDetails from "@/components/products/ProductDetail";
+import {ItemTable} from "@/components/item/ItemTable";
+import { ProductDetails } from "@/components/products/ProductDetail";
 export default function Products() {
   const { data: session } = useSession();
   const [products, setProducts] = useState<Product[]>([]); // Use Product type here
   const [loading, setLoading] = useState(true);
-
+  const [productId, setProductId] = useState<number>();
+  
+  
   useEffect(() => {
     fetch("http://localhost:8000/product", {
       method: "GET",
@@ -57,8 +60,16 @@ export default function Products() {
           <ProductTable data={products} />
         </CardContent>
       </Card>
-      {/* Render ProductDetails component with a productId */}
-      <ProductDetails productId={1} /> {/* Replace 1 with the actual product ID */}
+      <Card>
+      <CardHeader>
+        <CardTitle>Product</CardTitle>
+        <CardDescription>Overzicht</CardDescription>
+        </CardHeader>
+      <CardContent>
+        <ProductDetails data={products}/>
+      <ItemTable data={products} productId={products[0]} />
+      </CardContent>
+    </Card>
     </main>
   );
 }

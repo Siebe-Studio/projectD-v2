@@ -3,7 +3,14 @@
 import * as React from "react";
 import {
   ColumnDef,
+  ColumnFiltersState,
   SortingState,
+  VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
@@ -12,28 +19,59 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Table, TableBody, TableCell, TableHead, TableRow } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 import Link from "next/link";
 
 export type Item = {
   id: string;
-  productId: number;
-  product: {
+  serialNumber: string;
+  product: Product;
+  history: History[];
+};
+
+export type Product = {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  categoryId: number;
+  category: {
     id: number;
     name: string;
   };
-  history: {
-    title: string;
-    description: string;
-    date: string;
-  }[];
+  _count: {
+    items: number;
+  };
 };
 
-export const itemColumns: ColumnDef<Item>[] = [
+export type History = {
+  id: string;
+  location: string;
+  // Add more fields as needed
+};
+
+interface ItemTableProps {
+  data: Item[];
+  productId: number;
+}
+
+const columns: ColumnDef<Item>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -58,27 +96,25 @@ export const itemColumns: ColumnDef<Item>[] = [
   },
   {
     accessorKey: "id",
-    header: "ID",
+    header: "Id",
     cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "product.name",
+    accessorKey: "serialNumber",
+    header: "Serienummer",
+    cell: ({ row }) => <div className="capitalize">{row.getValue("serialNumber")}</div>,
+  },
+  {
+    accessorKey: "product",
+    accessorFn: (item) => item.product.name,
     header: "Product",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("product.name")}</div>,
+    cell: ({ row }) => <div className="capitalize">{row.getValue("product")}</div>,
   },
   {
     accessorKey: "history",
-    header: "History",
-    cell: ({ row }) => (
-      <div className="flex items-center">
-        <span className="mr-2">Laatste:</span>
-        {row.getValue("history").length > 0 ? (
-          <span className="text-blue-500">{row.getValue("history")[0].title}</span>
-        ) : (
-          <span className="text-gray-400">Geen geschiedenis</span>
-        )}
-      </div>
-    ),
+    accessorFn: (item) => item.history.map((h) => h.location).join(", "),
+    header: "Locatie",
+    cell: ({ row }) => <div className="capitalize">{row.getValue("history")}</div>,
   },
   {
     id: "actions",
@@ -94,84 +130,122 @@ export const itemColumns: ColumnDef<Item>[] = [
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenu>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(item.id)}
-            >
-              Kopieer item ID
-            </DropdownMenuItem>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>
               <Link href={`/items/${item.id}`}>
-                Bekijk item details
+                View Item
               </Link>
             </DropdownMenuItem>
-          </DropdownMenu>
+            <DropdownMenuSeparator />
+          </DropdownMenuContent>
         </DropdownMenu>
       );
     },
   },
 ];
 
-export function ItemTable({ data }: { data: Item[] }) {
-  const [sorting, setSorting] = React.useState<SortingState<Item>[]>([]);
-  const tableInstance = useReactTable<Item>({
-    columns: itemColumns,
-    data,
-    initialState: { sorting },
-  });
+export function ItemTable({ data, productId }: { data: Item[], productId: number }) {
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
-  const {
-    getTableProps,
-    headerGroups,
-    rows,
-    prepareRow,
-    canSort,
-    cannotSort,
-    getHeaderRowProps,
-  } = tableInstance.getTableProps();
+  // Filter items based on the provided productId
+  const filteredItems = data.filter((item) => item.product && item.product.id === productId);
+
+  const table = useReactTable({
+    data: filteredItems,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+    },
+  });
 
   return (
     <div className="w-full">
       <div className="rounded-md border">
-        <Table {...getTableProps()}>
-          <TableHead>
-            {headerGroups.map((headerGroup) => (
-              <TableRow {...getHeaderRowProps(headerGroup)}>
-                {headerGroup.headers.map((column) => (
-                  <TableCell
-                    key={column.id}
-                    className={`text-left ${
-                      canSort(column) ? "sortable" : ""
-                    } ${cannotSort(column) ? "not-sortable" : ""}`}
-                  >
-                    {column.renderHeader()}
-                    {canSort(column) && (
-                      <span className="sort-indicator">
-                        {sorting.some((s) => s.id === column.id) ? (
-                          <ArrowUpDown size="16" />
-                        ) : (
-                          <ChevronDown size="16" />
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
                         )}
-                      </span>
-                    )}
-                  </TableCell>
+                  </TableHead>
                 ))}
               </TableRow>
             ))}
-          </TableHead>
+          </TableHeader>
           <TableBody>
-            {rows.map((row) => {
-              prepareRow(row);
-              return (
-                <TableRow {...row.getRowProps()}>
-                  {row.cells.map((cell) => (
-                    <TableCell key={cell.id}>{cell.render("Cell")}</TableCell>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
                   ))}
                 </TableRow>
-              );
-            })}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );
