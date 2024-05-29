@@ -1,5 +1,11 @@
 {
   "dependencies": {
     "@tanstack/react-table": "^8.17.3"
-  }
+  },
+  
+    "prisma": {
+      "seed": "node prisma/seed.js"
+    }
+  
+  
 }
