@@ -36,7 +36,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import Link from "next/link";
+import { toast } from "sonner";
+import UpdateUserForm from "./UpdateUserForm";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import UpdateUserDialog from "./UpdateUserDialog";
 
 export type User = {
   id: string;
@@ -81,16 +85,77 @@ export const columns: ColumnDef<User>[] = [
       cell: ({ row }) => <div className="capitalize">{row.getValue("Naam")}</div>,
     },
     {
+      accessorKey: "email",
+      accessorFn: (user) => user.email,
+      header: "Email",
+      cell: ({ row }) => <div className="capitalize">{row.getValue("email")}</div>,
+    },
+    {
       accessorKey: "Rol",
       accessorFn: (user) => user.role,
       header: "Rol",
       cell: ({ row }) => <div className="capitalize">{row.getValue("Rol")}</div>,
+    },{
+      accessorKey: "Update",
+      header: "Update",
+      cell: ({ row }) => {<div className="capitalize">
+        <Card>
+          <CardHeader>
+            <CardTitle>User toevoegen</CardTitle>
+          </CardHeader>
+            <CardContent>
+                <UpdateUserDialog userId={row.getValue("id")}/>
+            </CardContent>
+        </Card>
+      </div>},
     },
     {
       id: "actions",
       enableHiding: false,
-      cell: ({ row }) => {
+      cell: ({ row }) => { 
         const user = row.original;
+
+        const deleteUser = async (userId: string) => {
+          const response = await fetch("http://localhost:8000/user/" + userId, {
+            method: 'DELETE',
+          });
+        
+          if (!response.ok) {
+            throw new Error('Failed to delete user');
+          }
+        
+          return response.json();
+        };
+        
+        const handleDeleteUser = async (userId: string) => {
+          const confirmation = window.confirm('Weet je zeker dat je deze gebruiker wilt verwijderen?');
+        
+          if (confirmation) {
+            try {
+              await deleteUser(userId);
+              toast.success("User verwijderd");
+              // router.push('/users');
+            } catch (error) {
+              console.log(error);
+              alert('Er is een fout opgetreden bij het verwijderen van de gebruiker');
+            }
+          }
+        };
+
+        const UserActionsMenu = ({ userId }: { userId: string }) => {
+          const [isDialogOpen, setIsDialogOpen] = useState(false);
+          const [selectedUser, setSelectedUser] = useState<string | null>(null);
+
+          const openDialog = (userId: string) => {
+            setSelectedUser(userId);
+            setIsDialogOpen(true);
+          };
+
+          const closeDialog = () => {
+            setIsDialogOpen(false);
+            setSelectedUser(null);
+          };
+        
   
         return (
           <DropdownMenu>
@@ -109,17 +174,18 @@ export const columns: ColumnDef<User>[] = [
               >
                 Kopieer user ID
               </DropdownMenuItem>
-              <DropdownMenuItem
-              >
-                  <Link href={`/user/${user.id}`}>
-                      Bekijk user
-                  </Link>
+              {/* <DropdownMenuItem onClick={(event) => openDialog(user.id)}>
+                Update user
+              </DropdownMenuItem> */}
+              <DropdownMenuItem onClick={() => handleDeleteUser(user.id)} >
+                Verwijder user
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </DropdownMenuContent>
           </DropdownMenu>
         );
-      },
+        }
+      }
     },
   ];
   

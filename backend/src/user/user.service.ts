@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateUserDto } from './dto/user.dto';
+import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { hash } from 'bcrypt';
 
 @Injectable()
@@ -60,10 +60,10 @@ export class UserService {
     });
   }
 
-  async update(id: string, updateUser: any) {
+  async update(id: string, dto: UpdateUserDto) {
     return this.prisma.user.update({
       where: { id },
-      data: updateUser,
+      data: dto,
     });
   }
 }

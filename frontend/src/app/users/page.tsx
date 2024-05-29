@@ -25,6 +25,7 @@ export default function Users() {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        // "authorisation": `bearer ${session?.backendTokens.accessToken}`,
       },
     })
       .then((res) => res.json())
@@ -36,7 +37,7 @@ export default function Users() {
       })
       .catch((error) => console.error(error))
       .finally(() => setLoading(false));
-  }, []);
+  }, [5000]);
 
   return (
     <main className="flex flex-col w-full h-full max-h-full p-4 gap-6">

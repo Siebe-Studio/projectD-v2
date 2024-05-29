@@ -15,7 +15,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -31,46 +30,64 @@ const formSchema = z.object({
   name: z.string().min(2, {
     message: "Naam moet minimaal 5 karakters bevatten",
   }),
-  password: z.string().min(12, {
-    message: "Minimaal 12 karakters",
-  }),
   email: z.string().email({
     message: "Ongeldig emailadres",
+  }),
+  role: z.string().min(2, {
+    message: "Kies een rol",
   })
 });
 
-export default function AddUserForm() {
+export default async function UpdateUserForm({userId}: {userId: string}) {
   const { data: session } = useSession();
+
   const [categories, setCategories] = useState<any[]>([]);
   const [postUser, setPostUser] = useState<any>();
-
   const [loading, setLoading] = useState(true);
+
   const submitUser = (values: any) => {
-    fetch("http://localhost:8000/user/create", {
-      method: "POST",
+    fetch("http://localhost:8000/user/" + userId, {
+      method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        // "Authorisation": `Bearer ${session?.user}`
+        "Authorisation": `Bearer ${session?.user}`
       },
       body: JSON.stringify(values),
     })
       .then((res) => res.json())
       .then((data) => {
         if (data) {
-          toast.success("User toegevoegd");
+          toast.success("User geupdate");
           console.log(data);
         }
       })
       .catch((error) => console.error(error));
   };
 
+  await fetch("http://localhost:8000/user/" + userId, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorisation": `Bearer ${session?.user}`
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data) {
+          setPostUser(data);
+          console.log(data);
+        }
+      })
+      .catch((error) => console.error(error));
+  
+
   // 1. Define your form.
 const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-        name: "",
-        password: "",
-        email: ""
+        name: postUser.name,
+        email: postUser.email,
+        role: postUser.role,
     },
 });
 
@@ -102,21 +119,12 @@ const form = useForm<z.infer<typeof formSchema>>({
         />
         <FormField
           control={form.control}
-          name="password"
+          name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel htmlFor={field.name}>
-                Wachtwoord
-              </FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <input
-                    type = "password"
-                    required
-                    {...field}
-                    onChange={field.onChange}
-                    value={field.value}
-                    placeholder="Voer het wachtwoord in"
-                />
+                <Input type="email" placeholder="voorbeeld@voorbeeld.nl" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -124,12 +132,21 @@ const form = useForm<z.infer<typeof formSchema>>({
         />
         <FormField
           control={form.control}
-          name="email"
+          name="role"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel htmlFor={field.name}>Rol</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="voorbeeld@voorbeeld.nl" {...field} />
+                <Select onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem key="User" value="User">User</SelectItem>
+                    <SelectItem key="MagazijnMedewerker" value="MagazijnMedewerker">MagazijnMedewerker</SelectItem>
+                    <SelectItem key="Admin" value="Admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -3,7 +3,7 @@ import { UserService } from './user.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/auth/guards/roles.decorator';
-import { CreateUserDto } from './dto/user.dto';
+import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -11,8 +11,8 @@ export class UserController {
     constructor(private userService: UserService) {}
 
     @Get(":id")
-    @Roles('ADMIN')
-    @UseGuards(JwtGuard)
+    // @Roles('ADMIN')
+    // @UseGuards(JwtGuard)
     async getUserProfile(@Param('id') id: string) {
         return await this.userService.findById(id);
     }
@@ -32,8 +32,8 @@ export class UserController {
         return this.userService.findAll();
     }
 
-    @Patch()
-    update(@Param('id') id: string, @Body() updateUser: any) {
-        return this.userService.update(id, updateUser);
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
+        return this.userService.update(id, dto);
     }
 }
