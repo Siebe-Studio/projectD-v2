@@ -94,7 +94,7 @@ export const columns: ColumnDef<Warehouse>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem><Link href={`/locations/${payment.id}`}>View Warehouse</Link></DropdownMenuItem>
+            <DropdownMenuItem><Link href={`/warehouse/${payment.id}`}>View Warehouse</Link></DropdownMenuItem>
             <DropdownMenuSeparator/>
             <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.phone)}> Copy Phone Number</DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigator.clipboard.writeText(payment.id)}> Copy Warehouse ID </DropdownMenuItem>

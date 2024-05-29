@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { WarehouseDataTable } from "@/components/locations/Warehouse"
+import { WarehouseDataTable } from "@/components/locations/WarehouseList"
 import { VehiclesDataTable } from "@/components/locations/Vehicles"
 
 export function GetCategoryTabs() {
