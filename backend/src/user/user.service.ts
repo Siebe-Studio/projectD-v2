@@ -45,4 +45,25 @@ export class UserService {
       },
     });
   }
+
+  async findAll() {
+    return this.prisma.user.findMany({
+      orderBy: { id: 'asc' },
+    });
+  }
+
+  async remove(id: string) {
+    return this.prisma.user.delete({
+      where: {
+        id,
+      },
+    });
+  }
+
+  async update(id: string, updateUser: any) {
+    return this.prisma.user.update({
+      where: { id },
+      data: updateUser,
+    });
+  }
 }
