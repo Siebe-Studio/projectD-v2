@@ -28,8 +28,8 @@ model Product {
   price       Float
 
   items      Item[]  // Define the relationship with Item
-  Category   Category? @relation(fields: [categoryId], references: [id])
-  categoryId Int?
+  category    Category? @relation(name: "ProductCategory", fields: [categoryId], references: [id])
+  categoryId  Int?
 }
 
 model Item {

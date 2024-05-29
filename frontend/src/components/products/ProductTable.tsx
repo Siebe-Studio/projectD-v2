@@ -38,8 +38,6 @@ import {
 
 import Link from "next/link";
 
-
-
 export type Product = {
   id: number;
   name: string;
@@ -55,6 +53,27 @@ export type Product = {
   };
 };
 
+const dummyProducts: Product[] = [
+  {
+    id: 1,
+    name: "Dummy Product 1",
+    description: "This is a dummy product.",
+    price: 9.99,
+    categoryId: 1,
+    category: { id: 1, name: "Dummy Category 1" },
+    _count: { items: 2 },
+  },
+  {
+    id: 2,
+    name: "Dummy Product 2",
+    description: "This is another dummy product.",
+    price: 19.99,
+    categoryId: 2,
+    category: { id: 2, name: "Dummy Category 2" },
+    _count: { items: 5 },
+  },
+  
+];
 
 export const columns: ColumnDef<Product>[] = [
   {
@@ -85,16 +104,15 @@ export const columns: ColumnDef<Product>[] = [
     cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "Naam",
-    accessorFn: (product) => product.name,
+    accessorKey: "name",
     header: "Naam",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("Naam")}</div>,
+    cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
   },
   {
-    accessorKey: "Categorie",
+    accessorKey: "category",
     accessorFn: (product) => product.category.name,
     header: "Categorie",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("Categorie")}</div>,
+    cell: ({ row }) => <div className="capitalize">{row.getValue("category")}</div>,
   },
   {
     accessorKey: "items",
@@ -115,7 +133,7 @@ export const columns: ColumnDef<Product>[] = [
     ),
   },
   {
-    accessorKey: "Prijs",
+    accessorKey: "price",
     accessorFn: (product) => product.price,
     header: ({ column }) => {
       return (
@@ -129,7 +147,7 @@ export const columns: ColumnDef<Product>[] = [
       );
     },
     cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("Prijs"));
+      const amount = parseFloat(row.getValue("price"));
 
       // Format the amount as a dollar amount
       const formatted = new Intl.NumberFormat("en-US", {
@@ -163,11 +181,10 @@ export const columns: ColumnDef<Product>[] = [
             >
               Kopieer product ID
             </DropdownMenuItem>
-            <DropdownMenuItem
-            >
-                <Link href={`/producten/${product.id}`}>
-                    Bekijk product
-                </Link>
+            <DropdownMenuItem>
+              <Link href={`/producten/${product.id}`}>
+                Bekijk product
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </DropdownMenuContent>
@@ -177,7 +194,7 @@ export const columns: ColumnDef<Product>[] = [
   },
 ];
 
-export function ProductTable({ data }: { data: Product[] }) {
+export function ProductTable() {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -187,7 +204,7 @@ export function ProductTable({ data }: { data: Product[] }) {
   const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
-    data,
+    data: dummyProducts,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -210,9 +227,9 @@ export function ProductTable({ data }: { data: Product[] }) {
       <div className="flex items-center py-4">
         <Input
           placeholder="Zoek product op naam..."
-          value={(table.getColumn("Naam")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("Naam")?.setFilterValue(event.target.value)
+            table.getColumn("name")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />

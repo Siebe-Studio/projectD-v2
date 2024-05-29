@@ -6,61 +6,36 @@ import { Prisma, Product } from '@prisma/client';
 export class ProductService {
   constructor(private prisma: PrismaService) {}
 
-  async seed(): Promise<void> {
-    try {
-      await this.prisma.product.createMany({
-        data: [
-          { 
-            id: 1,
-            name: 'Product 1', 
-            description: 'Description of Product 1', 
-            price: 19.99, 
-            categoryId: 1 
-          },
-          { 
-            id: 2,
-            name: 'Product 2', 
-            description: 'Description of Product 2', 
-            price: 29.99, 
-            categoryId: 2 
-          },
-          { 
-            id: 3,
-            name: 'Product 3', 
-            description: 'Description of Product 3', 
-            price: 39.99, 
-            categoryId: 1 
-          },
-          // Add more product objects as needed
-        ],
-      });
-
-      console.log('Products have been seeded.');
-    } catch (error) {
-      console.error('Error seeding products:', error);
-      throw error; // Rethrow the error to handle it in the caller
-    }
-  }
-
-  create(data): Promise<Product> {
+  create(data: {
+    name: string;
+    description?: string;
+    price: number;
+    categoryId: number;
+  }) {
     return this.prisma.product.create({
-      data,
+      data: {
+        name: data.name,
+        description: data.description,
+        price: data.price,
+        categoryId: data.categoryId,
+      },
+      include: {
+        Category: true,  // Include the related category in the response
+      },
     });
   }
 
-  findAll(): Promise<Product[]> {
+  findAll() {
     return this.prisma.product.findMany({
       include: {
         Category: true,
-        items: true,
+        _count: { select: { items: true } },
       },
-      orderBy: { id: 'desc' }, // Assuming 'id' is the primary key column
+      orderBy: { id: 'desc' },
     });
   }
-  
 
-  findOne(id: number): Promise<Product> {
-    // Implement logic to find product by ID using Prisma query
+  findOne(id: number) {
     return this.prisma.product.findUnique({
       where: { id },
       include: {
@@ -70,8 +45,7 @@ export class ProductService {
     });
   }
 
-  update(id: number, updateProductDto: any): Promise<Product> {
-    // Implement logic to update product by ID using Prisma query
+  update(id: number, updateProductDto: any) {
     return this.prisma.product.update({
       where: { id },
       data: updateProductDto,
@@ -82,8 +56,7 @@ export class ProductService {
     });
   }
 
-  remove(id: number): Promise<Product> {
-    // Implement logic to delete product by ID using Prisma query
+  remove(id: number) {
     return this.prisma.product.delete({
       where: { id },
       include: {

@@ -1,12 +1,10 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import AddProductDialog from "@/components/products/AddProductDialog";
 import { ProductTable } from "@/components/products/ProductTable"; // Ensure you're using the named export
 
 export default function Products() {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,20 +17,18 @@ export default function Products() {
             "Content-Type": "application/json",
           },
         });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch products: ${response.statusText}`);
-        }
-
         const data = await response.json();
-        setProducts(data);
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          setError("Invalid data format");
+        }
       } catch (error) {
-        setError("Error fetching products");
+        setError("Failed to fetch products");
       } finally {
         setLoading(false);
       }
     };
-
     fetchProducts();
   }, []);
 
