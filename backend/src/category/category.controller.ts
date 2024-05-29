@@ -12,7 +12,7 @@ import { CategoryService } from './category.service';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/auth/guards/roles.decorator';
-import { Category as CategoryModel } from '@prisma/client';
+import { Category as CategoryModel, Prisma } from '@prisma/client';
 
 @ApiTags('Category')
 @Controller('category')
@@ -22,7 +22,7 @@ export class CategoryController {
   @Get(':id')
   @Roles('STOCKMANAGER')
   @UseGuards(JwtGuard)
-  async getCategory(@Param('id', ParseIntPipe) id: number) {
+  async getCategory(@Param('id', ParseIntPipe) id: number): Promise<CategoryModel> {
     return await this.categoryService.findOne(id);
   }
 
@@ -31,29 +31,29 @@ export class CategoryController {
   @UseGuards(JwtGuard)
   async updateCategory(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: { name: string },
-  ) {
+    @Body() dto: Prisma.CategoryUpdateInput,
+  ): Promise<CategoryModel> {
     return await this.categoryService.update(id, dto);
   }
 
   @Get()
-  // @Roles('STOCKMANAGER')
-  // @UseGuards(JwtGuard)
-  async getCategories() {
+  @Roles('STOCKMANAGER')
+  @UseGuards(JwtGuard)
+  async getCategories(): Promise<CategoryModel[]> {
     return await this.categoryService.findAll();
   }
 
   @Post()
   @Roles('STOCKMANAGER')
   @UseGuards(JwtGuard)
-  async createCategory(@Body() dto: { name: string }): Promise<CategoryModel> {
+  async createCategory(@Body() dto: Prisma.CategoryCreateInput): Promise<CategoryModel> {
     return await this.categoryService.create(dto);
   }
 
   @Delete(':id')
   @Roles('STOCKMANAGER')
   @UseGuards(JwtGuard)
-  async deleteCategory(@Param('id', ParseIntPipe) id: number) {
+  async deleteCategory(@Param('id', ParseIntPipe) id: number): Promise<CategoryModel> {
     return await this.categoryService.delete(id);
   }
 }

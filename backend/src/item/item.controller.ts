@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Logger,
   UseGuards,
 } from '@nestjs/common';
 import { ItemService } from './item.service';
@@ -23,7 +22,7 @@ export class ItemController {
   @Post()
   @Roles('STOCKMANAGER')
   @UseGuards(JwtGuard)
-  create(@Body() data: { productId: number }) {
+  create(@Body() data: { productId: number; serialNumber: string }) {
     return this.itemService.create(data);
   }
 

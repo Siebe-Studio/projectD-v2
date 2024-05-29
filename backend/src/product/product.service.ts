@@ -1,46 +1,42 @@
+"use client";
+
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, Product } from '@prisma/client';
 
 @Injectable()
 export class ProductService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: {
-    name: string;
-    description?: string;
-    price: number;
-    categoryId: number;
-  }) {
+  create(data) {
     return this.prisma.product.create({
-      data: {
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        categoryId: data.categoryId,
-      },
+      data,
     });
   }
 
   findAll() {
     return this.prisma.product.findMany({
       include: {
-        category: true,
-        _count: { select: { items: true } },
+        Category: true,
+        items: true,
       },
-      orderBy: { id: 'desc' },
+      orderBy: { id: 'desc' }, // Assuming 'id' is the primary key column
     });
   }
+  
 
   findOne(id: number) {
-    return `This action returns a #${id} product`;
+    // Implement logic to find product by ID using Prisma query
+    return `This action returns a #${id} product (placeholder)`;
   }
 
   update(id: number, updateProductDto: any) {
-    return `This action updates a #${id} product`;
+    // Implement logic to update product by ID using Prisma query
+    return `This action updates a #${id} product (placeholder)`;
   }
 
   remove(id: number) {
-    return `This action removes a #${id} product`;
+    // Implement logic to delete product by ID using Prisma query
+    return `This action removes a #${id} product (placeholder)`;
   }
 }

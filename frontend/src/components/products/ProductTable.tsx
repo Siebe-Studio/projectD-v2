@@ -38,6 +38,8 @@ import {
 
 import Link from "next/link";
 
+
+
 export type Product = {
   id: number;
   name: string;
@@ -52,6 +54,7 @@ export type Product = {
     items: number;
   };
 };
+
 
 export const columns: ColumnDef<Product>[] = [
   {
