@@ -22,34 +22,34 @@ model Category {
 }
 
 model Product {
-  id          Int    @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
   description String
   price       Float
-
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id])
-
-  items Item[]
+  categoryId  Int
+  items       Item[]
+  category    Category @relation(fields: [categoryId], references: [id])
 }
 
 model Item {
-  id String @id @default(cuid())
-
+  id        String   @id @default(cuid())
   productId Int
-  product   Product @relation(fields: [productId], references: [id])
-
-  history History[]
-  // location
+  history   History?
+  product   Product  @relation(fields: [productId], references: [id])
 }
 
 model History {
-  id Int @id @default(autoincrement())
-
+  id          Int      @id @default(autoincrement())
   title       String
   description String
   date        DateTime @default(now())
+  itemId      String   @unique
+  item        Item     @relation(fields: [itemId], references: [id])
+}
 
-  itemId String @unique
-  item   Item   @relation(fields: [itemId], references: [id])
+model Vehicle {
+  id          Int     @id @default(autoincrement())
+  location_id Int
+  plate       String  @db.VarChar(255)
+  description String?
 }
