@@ -15,7 +15,7 @@ export default function UpdateUserDialog(user: any) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="w-full">Edit User</Button>
+        <Button className="w-full bg-none bg:hover">Edit User</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

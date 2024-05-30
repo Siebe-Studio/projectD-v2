@@ -151,7 +151,7 @@ export const columns: ColumnDef<User>[] = [
                 }
               >
                 Kopieer user ID
-              </DropdownMenuItem>
+              </DropdownMenuItem>               
               <DropdownMenuItem onClick={() => handleDeleteUser(user.id)} >
                 Verwijder user
               </DropdownMenuItem>
