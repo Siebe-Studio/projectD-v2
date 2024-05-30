@@ -1,11 +1,22 @@
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ProductDetails } from "@/components/products/ProductDetail";
+import { ItemTable } from "@/components/items/ItemTable";
+
 export default function ProductPage({ params }: { params: { id: string } }) {
   const { id } = params;
 
-  // You can use the `id` variable here to fetch data for the product with this ID
-
   return (
-    <div>
-      <h1>ProductPage: {id}</h1>
-    </div>
+    <main className="flex flex-col w-full h-full max-h-full p-4 gap-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Product</CardTitle>
+          <CardDescription>Overzicht</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ProductDetails productId={parseInt(id, 10)} />
+          <ItemTable productId={parseInt(id, 10)} />
+        </CardContent>
+      </Card>
+    </main>
   );
 }

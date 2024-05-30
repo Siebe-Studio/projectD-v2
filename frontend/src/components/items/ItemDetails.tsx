@@ -2,17 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 
-export function ProductDetails({ productId }) {
-  const [product, setProduct] = useState(null);
+export function ItemDetails({ itemId }) {
+  const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!productId) return;
+    if (!itemId) return;
 
-    const fetchProductDetails = async () => {
+    const fetchItemDetails = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/product/${productId}`, {
+        const response = await fetch(`http://localhost:8000/item/${itemId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -22,7 +22,7 @@ export function ProductDetails({ productId }) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        setProduct(data);
+        setItem(data);
       } catch (error) {
         setError(error);
       } finally {
@@ -30,8 +30,8 @@ export function ProductDetails({ productId }) {
       }
     };
 
-    fetchProductDetails();
-  }, [productId]); // Correctly set the dependency array
+    fetchItemDetails();
+  }, [itemId]); // Correctly set the dependency array
 
   if (loading) {
     return <div>Loading...</div>;
@@ -41,17 +41,17 @@ export function ProductDetails({ productId }) {
     return <div>Error: {error.message}</div>;
   }
 
-  if (!product) {
-    return <div>No product found</div>;
+  if (!item) {
+    return <div>No item found</div>;
   }
 
   return (
-    <div className="product-details">
-      <h2>{product.name}</h2>
-      <p>{product.description}</p>
-      <p>Prijs: {product.price} Euro</p>
-      <p>SKU: {product.sku}</p>
-      <p>Count: {product._count?.items}</p>
+    <div className="item-details">
+      <h2>{item.name}</h2>
+      <p>{item.description}</p>
+      <p>Prijs: {item.price} Euro</p>
+      <p>SKU: {item.sku}</p>
+      <p>Count: {item._count?.products}</p>
     </div>
   );
 }

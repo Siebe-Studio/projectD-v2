@@ -12,7 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {ItemTable} from "@/components/item/ItemTable";
+import {ItemTable} from "@/components/items/ItemTable";
 import { ProductDetails } from "@/components/products/ProductDetail";
 export default function Products() {
   const { data: session } = useSession();
@@ -60,16 +60,6 @@ export default function Products() {
           <ProductTable data={products} />
         </CardContent>
       </Card>
-      <Card>
-      <CardHeader>
-        <CardTitle>Product</CardTitle>
-        <CardDescription>Overzicht</CardDescription>
-        </CardHeader>
-      <CardContent>
-        <ProductDetails data={products}/>
-      <ItemTable productId={1}/>
-      </CardContent>
-    </Card>
     </main>
   );
 }
