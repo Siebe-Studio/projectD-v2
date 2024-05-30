@@ -3,18 +3,17 @@
 import * as React from "react";
 import {
   ColumnDef,
-  ColumnFiltersState,
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getFilteredRowModel,
+  getSortedRowModel,
   SortingState,
+  ColumnFiltersState,
   VisibilityState,
   flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
 } from "@tanstack/react-table";
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -27,18 +26,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export type Vehicle = {
   id: number;
-  location_id: number;
   plate: string;
   description: string;
 };
@@ -68,30 +59,21 @@ export const columns: ColumnDef<Vehicle>[] = [
   },
   {
     accessorKey: "id",
-    header: "Id",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
-  },
-  {
-    accessorKey: "location_id",
-    header: "Location ID",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("location_id")}</div>,
+    header: "ID",
   },
   {
     accessorKey: "plate",
-    header: "Plaat",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("plate")}</div>,
+    header: "Kenteken",
   },
   {
     accessorKey: "description",
     header: "Beschrijving",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("description")}</div>,
   },
   {
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
       const vehicle = row.original;
-
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -149,7 +131,7 @@ export function VehicleTable({ data }: { data: Vehicle[] }) {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Zoek voertuig op plaat..."
+          placeholder="Zoek voertuig op kenteken..."
           value={(table.getColumn("plate")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("plate")?.setFilterValue(event.target.value)
@@ -188,23 +170,21 @@ export function VehicleTable({ data }: { data: Vehicle[] }) {
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
@@ -212,21 +192,15 @@ export function VehicleTable({ data }: { data: Vehicle[] }) {
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  Geen resultaten.
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Geen gegevens gevonden.
                 </TableCell>
               </TableRow>
             )}
@@ -235,7 +209,7 @@ export function VehicleTable({ data }: { data: Vehicle[] }) {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} van de {" "}
+          {table.getFilteredSelectedRowModel().rows.length} van de{" "}
           {table.getFilteredRowModel().rows.length} rij(en) geselecteerd.
         </div>
         <div className="space-x-2">

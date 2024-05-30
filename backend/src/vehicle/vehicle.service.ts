@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { Prisma, Vehicle} from '@prisma/client';
-import { CreateVehicleDto } from "src/vehicle/dto/create-vehicle.dto";
+import { CreateVehicleDto } from './dto/create-vehicle.dto';
 
 @Injectable()
 export class VehicleService {
@@ -9,18 +8,15 @@ export class VehicleService {
 
   async create(createVehicleDto: CreateVehicleDto) {
     return this.prisma.vehicle.create({
-      data: {
-        location_id: createVehicleDto.location_id,
-        plate: createVehicleDto.plate,
-        description: createVehicleDto.description 
-      },
+      data: createVehicleDto,
     });
   }
-  async findAll(): Promise<Vehicle[]> {
+
+  async findAll() {
     return this.prisma.vehicle.findMany();
   }
 
-  async findOne(id: number): Promise<Vehicle> {
+  async findOne(id: number) {
     return this.prisma.vehicle.findUnique({
       where: { id },
     });
@@ -29,14 +25,11 @@ export class VehicleService {
   async update(id: number, updateVehicleDto: CreateVehicleDto) {
     return this.prisma.vehicle.update({
       where: { id },
-      data: {
-        location_id: updateVehicleDto.location_id,
-        plate: updateVehicleDto.plate,
-        description: updateVehicleDto.description 
-      },
+      data: updateVehicleDto,
     });
   }
-  async delete(id: number): Promise<Vehicle> {
+
+  async remove(id: number) {
     return this.prisma.vehicle.delete({
       where: { id },
     });

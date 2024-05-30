@@ -2,38 +2,33 @@
 
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { VehicleTable } from "@/components/vehicles/VehicleTable";
 import AddVehicleDialog from "@/components/vehicles/AddVehicleDialog";
-import { VehicleTable } from "@/components/vehicles/VehicleTable"; // Zorg ervoor dat je de named export gebruikt
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Vehicles() {
   const { data: session } = useSession();
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchVehicles = async () => {
-      try {
-        const response = await fetch("http://localhost:8000/api/vehicles", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-        const data = await response.json();
-        if (Array.isArray(data)) {
+    fetch("http://localhost:8000/vehicle", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data) {
           setVehicles(data);
-        } else {
-          setError("Invalid data format");
+          console.log(data);
         }
-      } catch (error) {
-        setError("Failed to fetch vehicles");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchVehicles();
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -54,13 +49,7 @@ export default function Vehicles() {
           <CardDescription>Overzicht van alle voertuigen</CardDescription>
         </CardHeader>
         <CardContent>
-          {loading ? (
-            <p>Loading...</p>
-          ) : error ? (
-            <p>{error}</p>
-          ) : (
-            <VehicleTable data={vehicles} />
-          )}
+          <VehicleTable data={vehicles} />
         </CardContent>
       </Card>
     </main>

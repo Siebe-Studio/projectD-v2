@@ -1,54 +1,33 @@
-import {Controller,Get,Post,Put,Delete,Body,Param,ParseIntPipe,UseGuards} from '@nestjs/common';
-  import { VehicleService } from 'src/vehicle/vehicle.service';
-  import { JwtGuard } from 'src/auth/guards/jwt.guard';
-  import { ApiTags, ApiBody } from '@nestjs/swagger';
-  import { Roles } from 'src/auth/guards/roles.decorator';
-  import { Vehicle as VehicleModel } from '@prisma/client';
-  import { CreateVehicleDto } from "src/vehicle/dto/create-vehicle.dto";
-  
-  @ApiTags('Vehicle')
-  @Controller('vehicle')
-  export class VehicleController {
-    constructor(private vehicleService: VehicleService) {}
-  
-    @Get(':id')
-    @Roles('STOCKMANAGER')
-    @UseGuards(JwtGuard)
-    async getVehicle(@Param('id', ParseIntPipe) id: number): Promise<VehicleModel> {
-      return this.vehicleService.findOne(id);
-    }
-  
+import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
+import { VehicleService } from 'src/vehicle/vehicle.service';
+import { CreateVehicleDto } from './dto/create-vehicle.dto';
+
+@Controller('vehicle')
+export class VehicleController {
+  constructor(private readonly vehicleService: VehicleService) {}
+
+  @Get()
+  async findAll() {
+    return this.vehicleService.findAll();
+  }
+
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.vehicleService.findOne(id);
+  }
+
   @Post()
-  @Roles('STOCKMANAGER')
-  @UseGuards(JwtGuard)
-  @ApiBody({ type: CreateVehicleDto }) 
-  async createVehicle(@Body() createVehicleDto: CreateVehicleDto): Promise<VehicleModel> {
+  async create(@Body() createVehicleDto: CreateVehicleDto) {
     return this.vehicleService.create(createVehicleDto);
   }
-  
+
   @Put(':id')
-  @Roles('STOCKMANAGER')
-  @UseGuards(JwtGuard)
-  @ApiBody({ type: CreateVehicleDto }) 
-  async updateVehicle(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateVehicleDto: CreateVehicleDto
-    ): Promise<VehicleModel> {
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateVehicleDto: CreateVehicleDto) {
     return this.vehicleService.update(id, updateVehicleDto);
-    }
-  
-    @Delete(':id')
-    @Roles('STOCKMANAGER')
-    @UseGuards(JwtGuard)
-    async deleteVehicle(@Param('id', ParseIntPipe) id: number): Promise<VehicleModel> {
-      return this.vehicleService.delete(id);
-    }
-  
-    @Get()
-    @Roles('STOCKMANAGER')
-    @UseGuards(JwtGuard)
-    async findAll(): Promise<VehicleModel[]> {
-      return this.vehicleService.findAll();
-    }
   }
-  
+
+  @Delete(':id')
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return this.vehicleService.remove(id);
+  }
+}

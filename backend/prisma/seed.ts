@@ -3,17 +3,24 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.vehicle.createMany({
-    data: [
-      { location_id: 101, plate: 'AB123CD', description: 'Voertuig 1' },
-      { location_id: 102, plate: 'EF456GH', description: 'Voertuig 2' },
-      { location_id: 103, plate: 'IJ789KL', description: 'Voertuig 3' },
-      { location_id: 104, plate: 'MN012OP', description: 'Voertuig 4' },
-      { location_id: 105, plate: 'QR345ST', description: 'Voertuig 5' },
-    ],
+  // Add test vehicles
+  const vehicle1 = await prisma.vehicle.create({
+    data: {
+      plate: 'AB-123-CD',
+      description: 'Een blauwe auto',
+      location_id: 1,  
+    },
   });
 
-  console.log('Voertuigen zijn toegevoegd aan de database.');
+  const vehicle2 = await prisma.vehicle.create({
+    data: {
+      plate: 'EF-456-GH',
+      description: 'Een rode vrachtwagen',
+      location_id: 2, 
+    },
+  });
+
+  console.log({ vehicle1, vehicle2 });
 }
 
 main()

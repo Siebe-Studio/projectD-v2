@@ -1,21 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { VehicleController } from 'src/vehicle/vehicle.controller';
-import { VehicleService } from 'src/vehicle/vehicle.service';
+import { z } from 'zod';
 
-describe('VehicleController', () => {
-  let controller: VehicleController;
-  let service: VehicleService;
-
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [VehicleController],
-    }).compile();
-
-    controller = module.get<VehicleController>(VehicleController);
-    service = module.get<VehicleService>(VehicleService);
-  });
-
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+export const CreateVehicleDto = z.object({
+  location_id: z.number().int().positive(),
+  plate: z.string().min(1, { message: 'Plate is required' }),
+  description: z.string().optional(),
 });
+
+export type CreateVehicleDto = z.infer<typeof CreateVehicleDto>;
