@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { unknown } from 'zod';
 
-export function ProductDetails({ productId }) {
+export function ProductDetails({ productId}) {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,7 +25,7 @@ export function ProductDetails({ productId }) {
         const data = await response.json();
         setProduct(data);
       } catch (error) {
-        setError(error);
+        setError(null);
       } finally {
         setLoading(false);
       }
@@ -38,7 +39,7 @@ export function ProductDetails({ productId }) {
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <div>Error: {error}</div>;
   }
 
   if (!product) {

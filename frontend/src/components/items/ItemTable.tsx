@@ -64,58 +64,7 @@ export type History = {
   // Add more fields as needed
 };
 
-// Example dummy data
-const dummyProducts: Product[] = [
-  {
-    id: 1,
-    name: "Dummy Product 1",
-    description: "This is a dummy product.",
-    price: 9.99,
-    categoryId: 1,
-    category: { id: 1, name: "Dummy Category 1" },
-    items: [
-      {
-        id: "1",
-        serialNumber: "SN001",
-        productId: 1,
-        history: [
-          { id: "1", location: "Warehouse A" },
-          { id: "2", location: "Warehouse B" },
-        ],
-      },
-      {
-        id: "2",
-        serialNumber: "SN002",
-        productId: 1,
-        history: [
-          { id: "3", location: "Warehouse C" },
-          { id: "4", location: "Warehouse D" },
-        ],
-      },
-    ],
-  },
-  {
-    id: 2,
-    name: "Dummy Product 2",
-    description: "This is another dummy product.",
-    price: 19.99,
-    categoryId: 2,
-    category: { id: 2, name: "Dummy Category 2" },
-    items: [
-      {
-        id: "3",
-        serialNumber: "SN003",
-        productId: 2,
-        history: [
-          { id: "5", location: "Warehouse E" },
-          { id: "6", location: "Warehouse F" },
-        ],
-      },
-    ],
-  },
-  // Add more dummy products as needed
-];
-
+// Define the columns
 export const columns: ColumnDef<Item>[] = [
   {
     id: "select",
@@ -149,7 +98,6 @@ export const columns: ColumnDef<Item>[] = [
     header: "Serienummer",
     cell: ({ row }) => <div className="capitalize">{row.getValue("serialNumber")}</div>,
   },
-
   {
     accessorKey: "history",
     accessorFn: (item) => item.history.map((h) => h.location)[0],
@@ -187,16 +135,23 @@ export const columns: ColumnDef<Item>[] = [
 
 export function ItemTable({ productId }: { productId: number }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [items, setItems] = React.useState<Item[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
-  // Find the product by productId and get its items
-  const product = dummyProducts.find(product => product.id === productId);
-  const items = product ? product.items : [];
+  React.useEffect(() => {
+    fetch(`http://localhost:8000/product/${productId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.items) {
+          setItems(data.items);
+        }
+      })
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
+  }, [productId]);
 
   const table = useReactTable({
     data: items,
@@ -276,29 +231,26 @@ export function ItemTable({ productId }: { productId: number }) {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Loading...
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  Geen resulaten.
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Geen resultaten.
                 </TableCell>
               </TableRow>
             )}

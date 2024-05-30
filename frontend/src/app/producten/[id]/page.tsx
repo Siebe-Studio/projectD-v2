@@ -4,6 +4,7 @@ import { ItemTable } from "@/components/items/ItemTable";
 
 export default function ProductPage({ params }: { params: { id: string } }) {
   const { id } = params;
+  
 
   return (
     <main className="flex flex-col w-full h-full max-h-full p-4 gap-6">

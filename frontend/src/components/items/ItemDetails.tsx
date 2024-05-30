@@ -24,21 +24,21 @@ export function ItemDetails({ itemId }) {
         const data = await response.json();
         setItem(data);
       } catch (error) {
-        setError(error);
+        setError(null);
       } finally {
         setLoading(false);
       }
     };
 
     fetchItemDetails();
-  }, [itemId]); // Correctly set the dependency array
+  }, [itemId]);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   if (error) {
-    return <div>Error: {error.message}</div>;
+    return <div>Error: {error}</div>;
   }
 
   if (!item) {
@@ -51,7 +51,7 @@ export function ItemDetails({ itemId }) {
       <p>{item.description}</p>
       <p>Prijs: {item.price} Euro</p>
       <p>SKU: {item.sku}</p>
-      <p>Count: {item._count?.products}</p>
+      <p>Product Count: {item._count?.products}</p>
     </div>
   );
 }

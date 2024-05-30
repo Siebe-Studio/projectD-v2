@@ -53,28 +53,6 @@ export type Product = {
   };
 };
 
-const dummyProducts: Product[] = [
-  {
-    id: 1,
-    name: "Dummy Product 1",
-    description: "This is a dummy product.",
-    price: 9.99,
-    categoryId: 1,
-    category: { id: 1, name: "Dummy Category 1" },
-    _count: { items: 2 },
-  },
-  {
-    id: 2,
-    name: "Dummy Product 2",
-    description: "This is another dummy product.",
-    price: 19.99,
-    categoryId: 2,
-    category: { id: 2, name: "Dummy Category 2" },
-    _count: { items: 5 },
-  },
-  // Add more dummy products as needed
-];
-
 export const columns: ColumnDef<Product>[] = [
   {
     id: "select",
@@ -110,7 +88,7 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "category",
-    accessorFn: (product) => product.category.name,
+    accessorFn: (product) => product.category,
     header: "Categorie",
     cell: ({ row }) => <div className="capitalize">{row.getValue("category")}</div>,
   },
@@ -149,7 +127,6 @@ export const columns: ColumnDef<Product>[] = [
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("price"));
 
-      // Format the amount as a dollar amount
       const formatted = new Intl.NumberFormat("en-US", {
         style: "currency",
         currency: "EUR",
@@ -194,17 +171,15 @@ export const columns: ColumnDef<Product>[] = [
   },
 ];
 
-export function ProductTable() {
+export function ProductTable({ data }: { data: Product[] }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [loading, setLoading] = React.useState(false);
 
   const table = useReactTable({
-    data: dummyProducts,
+    data: data,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -281,29 +256,26 @@ export function ProductTable() {
             ))}
           </TableHeader>
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Loading...
+                </TableCell>
+              </TableRow>
+            ) : table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
-                  No results.
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  Geen resultaten.
                 </TableCell>
               </TableRow>
             )}
@@ -312,7 +284,7 @@ export function ProductTable() {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} van de {" "}
+          {table.getFilteredSelectedRowModel().rows.length} van de{" "}
           {table.getFilteredRowModel().rows.length} rij(en) geselecteerd.
         </div>
         <div className="space-x-2">
