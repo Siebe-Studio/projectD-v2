@@ -24,4 +24,8 @@ export class UpdateUserDto {
     @ApiProperty()
     @IsEmail()
     email: string;
+
+    @ApiProperty()
+    @IsString()
+    role: string;
 }

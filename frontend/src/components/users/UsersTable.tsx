@@ -98,16 +98,9 @@ export const columns: ColumnDef<User>[] = [
     },{
       accessorKey: "Update",
       header: "Update",
-      cell: ({ row }) => {<div className="capitalize">
-        <Card>
-          <CardHeader>
-            <CardTitle>User toevoegen</CardTitle>
-          </CardHeader>
-            <CardContent>
-                <UpdateUserDialog userId={row.getValue("id")}/>
-            </CardContent>
-        </Card>
-      </div>},
+      cell: ({ row }) => (<div className="capitalize">
+        <UpdateUserDialog user={row.original}/>
+      </div>),
     },
     {
       id: "actions",
@@ -142,21 +135,6 @@ export const columns: ColumnDef<User>[] = [
           }
         };
 
-        const UserActionsMenu = ({ userId }: { userId: string }) => {
-          const [isDialogOpen, setIsDialogOpen] = useState(false);
-          const [selectedUser, setSelectedUser] = useState<string | null>(null);
-
-          const openDialog = (userId: string) => {
-            setSelectedUser(userId);
-            setIsDialogOpen(true);
-          };
-
-          const closeDialog = () => {
-            setIsDialogOpen(false);
-            setSelectedUser(null);
-          };
-        
-  
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -174,9 +152,6 @@ export const columns: ColumnDef<User>[] = [
               >
                 Kopieer user ID
               </DropdownMenuItem>
-              {/* <DropdownMenuItem onClick={(event) => openDialog(user.id)}>
-                Update user
-              </DropdownMenuItem> */}
               <DropdownMenuItem onClick={() => handleDeleteUser(user.id)} >
                 Verwijder user
               </DropdownMenuItem>
@@ -186,7 +161,6 @@ export const columns: ColumnDef<User>[] = [
         );
         }
       }
-    },
   ];
   
   export function UserTable({ data }: { data: User[] }) {

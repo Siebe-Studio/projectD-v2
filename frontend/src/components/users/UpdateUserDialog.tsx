@@ -11,7 +11,7 @@ import {
 import AddUserForm from "./AddUserForm"
 import UpdateUserForm from "./UpdateUserForm"
 
-export default function UpdateUserDialog(userId: any) {
+export default function UpdateUserDialog(user: any) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -25,7 +25,7 @@ export default function UpdateUserDialog(userId: any) {
           </DialogDescription>
         </DialogHeader>
 
-        <UpdateUserForm userId={userId.toString()} />
+        <UpdateUserForm user={user} />
       </DialogContent>
     </Dialog>
   )

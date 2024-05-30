@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { boolean, z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -38,68 +38,53 @@ const formSchema = z.object({
   })
 });
 
-export default async function UpdateUserForm({userId}: {userId: string}) {
+export default function UpdateUserForm({user}: {user: any}) {
   const { data: session } = useSession();
-
-  const [categories, setCategories] = useState<any[]>([]);
-  const [postUser, setPostUser] = useState<any>();
+  const [postUser, setPostUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  const submitUser = (values: any) => {
-    fetch("http://localhost:8000/user/" + userId, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorisation": `Bearer ${session?.user}`
-      },
-      body: JSON.stringify(values),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data) {
-          toast.success("User geupdate");
-          console.log(data);
-        }
-      })
-      .catch((error) => console.error(error));
+  const submitUser = async (values: any) => {
+    try {
+      const response = await fetch("http://localhost:8000/user/" + user.user.id, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session?.user}`,
+        },
+        body: JSON.stringify(values),
+      });
+      const data = await response.json();
+      toast.success("User geupdate");
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  await fetch("http://localhost:8000/user/" + userId, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorisation": `Bearer ${session?.user}`
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data) {
-          setPostUser(data);
-          console.log(data);
-        }
-      })
-      .catch((error) => console.error(error));
-  
-
-  // 1. Define your form.
-const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: user.user.name,
+      email: user.user.email,
+      role: user.user.role,
+    },
+  });
+
+  useEffect(() => {
+    if (postUser) {
+      form.reset({
         name: postUser.name,
         email: postUser.email,
         role: postUser.role,
-    },
-});
+      });
+    }
+  }, [postUser, form]);
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     console.log(values);
     submitUser(values);
     form.reset();
-    
-  }
+  };
 
   return (
     <Form {...form}>
@@ -139,12 +124,12 @@ const form = useForm<z.infer<typeof formSchema>>({
               <FormControl>
                 <Select onValueChange={field.onChange}>
                   <SelectTrigger>
-                    <SelectValue placeholder="..." />
+                    <SelectValue defaultValue={user.user.role} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem key="User" value="User">User</SelectItem>
-                    <SelectItem key="MagazijnMedewerker" value="MagazijnMedewerker">MagazijnMedewerker</SelectItem>
-                    <SelectItem key="Admin" value="Admin">Admin</SelectItem>
+                    <SelectItem key="USER" value="USER">User</SelectItem>
+                    <SelectItem key="STOCKMANAGER" value="STOCKMANAGER">MagazijnMedewerker</SelectItem>
+                    <SelectItem key="ADMIN" value="ADMIN">Admin</SelectItem>
                   </SelectContent>
                 </Select>
               </FormControl>
