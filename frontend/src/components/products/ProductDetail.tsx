@@ -14,7 +14,6 @@ export function ProductDetails({ data }) {
       <p>{product.description}</p>
       <p>Prijs: {product.price} Euro</p>
       <p>SKU {product._count.items}</p>
-      {/* You can add more details here */}
     </div>
   );
 }

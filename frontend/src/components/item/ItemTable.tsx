@@ -41,7 +41,7 @@ import Link from "next/link";
 export type Item = {
   id: string;
   serialNumber: string;
-  product: Product;
+  productId: number;
   history: History[];
 };
 
@@ -55,9 +55,7 @@ export type Product = {
     id: number;
     name: string;
   };
-  _count: {
-    items: number;
-  };
+  items: Item[];
 };
 
 export type History = {
@@ -66,12 +64,59 @@ export type History = {
   // Add more fields as needed
 };
 
-interface ItemTableProps {
-  data: Item[];
-  productId: number;
-}
+// Example dummy data
+const dummyProducts: Product[] = [
+  {
+    id: 1,
+    name: "Dummy Product 1",
+    description: "This is a dummy product.",
+    price: 9.99,
+    categoryId: 1,
+    category: { id: 1, name: "Dummy Category 1" },
+    items: [
+      {
+        id: "1",
+        serialNumber: "SN001",
+        productId: 1,
+        history: [
+          { id: "1", location: "Warehouse A" },
+          { id: "2", location: "Warehouse B" },
+        ],
+      },
+      {
+        id: "2",
+        serialNumber: "SN002",
+        productId: 1,
+        history: [
+          { id: "3", location: "Warehouse C" },
+          { id: "4", location: "Warehouse D" },
+        ],
+      },
+    ],
+  },
+  {
+    id: 2,
+    name: "Dummy Product 2",
+    description: "This is another dummy product.",
+    price: 19.99,
+    categoryId: 2,
+    category: { id: 2, name: "Dummy Category 2" },
+    items: [
+      {
+        id: "3",
+        serialNumber: "SN003",
+        productId: 2,
+        history: [
+          { id: "5", location: "Warehouse E" },
+          { id: "6", location: "Warehouse F" },
+        ],
+      },
+    ],
+  },
+  // Add more dummy products as needed
+];
 
-const columns: ColumnDef<Item>[] = [
+export const columns: ColumnDef<Item>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -104,20 +149,15 @@ const columns: ColumnDef<Item>[] = [
     header: "Serienummer",
     cell: ({ row }) => <div className="capitalize">{row.getValue("serialNumber")}</div>,
   },
-  {
-    accessorKey: "product",
-    accessorFn: (item) => item.product.name,
-    header: "Product",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("product")}</div>,
-  },
+
   {
     accessorKey: "history",
-    accessorFn: (item) => item.history.map((h) => h.location).join(", "),
+    accessorFn: (item) => item.history.map((h) => h.location)[0],
     header: "Locatie",
     cell: ({ row }) => <div className="capitalize">{row.getValue("history")}</div>,
   },
   {
-    id: "actions",
+    id: "acties",
     enableHiding: false,
     cell: ({ row }) => {
       const item = row.original;
@@ -134,7 +174,7 @@ const columns: ColumnDef<Item>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>
               <Link href={`/items/${item.id}`}>
-                View Item
+                Bekijk Item
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -145,17 +185,21 @@ const columns: ColumnDef<Item>[] = [
   },
 ];
 
-export function ItemTable({ data, productId }: { data: Item[], productId: number }) {
+export function ItemTable({ productId }: { productId: number }) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  // Filter items based on the provided productId
-  const filteredItems = data.filter((item) => item.product && item.product.id === productId);
+  // Find the product by productId and get its items
+  const product = dummyProducts.find(product => product.id === productId);
+  const items = product ? product.items : [];
 
   const table = useReactTable({
-    data: filteredItems,
+    data: items,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -175,21 +219,59 @@ export function ItemTable({ data, productId }: { data: Item[], productId: number
 
   return (
     <div className="w-full">
+      <div className="flex items-center py-4">
+        <Input
+          placeholder="Zoek naar serienummer..."
+          value={(table.getColumn("serialNumber")?.getFilterValue() as string) ?? ""}
+          onChange={(event) =>
+            table.getColumn("serialNumber")?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="ml-auto">
+              Columns <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {table
+              .getAllColumns()
+              .filter((column) => column.getCanHide())
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(!!value)
+                    }
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
@@ -216,7 +298,7 @@ export function ItemTable({ data, productId }: { data: Item[], productId: number
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  Geen resulaten.
                 </TableCell>
               </TableRow>
             )}
@@ -225,8 +307,8 @@ export function ItemTable({ data, productId }: { data: Item[], productId: number
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getFilteredSelectedRowModel().rows.length} van{" "}
+          {table.getFilteredRowModel().rows.length} rij(en) geselecteerd.
         </div>
         <div className="space-x-2">
           <Button
@@ -235,7 +317,7 @@ export function ItemTable({ data, productId }: { data: Item[], productId: number
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Previous
+            Vorige
           </Button>
           <Button
             variant="outline"
@@ -243,7 +325,7 @@ export function ItemTable({ data, productId }: { data: Item[], productId: number
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Next
+            Volgende
           </Button>
         </div>
       </div>

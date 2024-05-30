@@ -67,7 +67,7 @@ export default function Products() {
         </CardHeader>
       <CardContent>
         <ProductDetails data={products}/>
-      <ItemTable data={products} productId={products[0]} />
+      <ItemTable productId={1}/>
       </CardContent>
     </Card>
     </main>
