@@ -12,6 +12,7 @@ import {
   Bus,
   Users,
   CircleUser,
+  MapPin
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -84,6 +85,13 @@ export default function Dashboard({ children} : { children: React.ReactNode}) {
               >
                 <Package className="h-4 w-4" />
                 Producten
+              </Link>
+              <Link
+                href="/locations"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-primary transition-all hover:text-primary"
+              >
+                <MapPin className="h-4 w-4" />
+                Locaties
               </Link>
               <Link
                 href="#"
