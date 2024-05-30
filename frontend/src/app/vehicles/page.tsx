@@ -1,16 +1,13 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-
-import { VehicleTable } from "@/components/vehicles/VehicleTable";
+import { VehicleTable, Vehicle } from "@/components/vehicles/VehicleTable";
 import AddVehicleDialog from "@/components/vehicles/AddVehicleDialog";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/products/ui/card";
 
 export default function Vehicles() {
-  const { data: session } = useSession();
-  const [vehicles, setVehicles] = useState<any[]>([]);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

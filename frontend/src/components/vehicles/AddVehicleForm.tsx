@@ -3,15 +3,26 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Form, FormField, FormItem, FormLabel, FormMessage, FormControl } from "@/components/ui/form";
-import { toast } from "react-toastify";
+
+import { Button } from "@/components/products/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/products/ui/form";
+import { Input } from "@/components/products/ui/input";
+import { Textarea } from "@/components/products/ui/textarea";
+import { toast } from "sonner";
+
+import React, { useEffect, useState } from "react";
 
 const formSchema = z.object({
-  location_id: z.number().int().positive({
-    message: "Location ID moet een positief nummer zijn",
+  location_id: z.number({
+    required_error: "Locatie ID is verplicht",
   }),
   plate: z.string().min(2, {
     message: "Kenteken moet minimaal 2 karakters bevatten",
@@ -22,16 +33,9 @@ const formSchema = z.object({
 });
 
 export default function AddVehicleForm() {
-  const form = useForm({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      plate: "",
-      description: "",
-      location_id: 1,
-    },
-  });
+  const [postVehicle, setPostVehicle] = useState<any>();
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const submitVehicle = (values: any) => {
     fetch("http://localhost:8000/vehicle", {
       method: "POST",
       headers: {
@@ -42,27 +46,56 @@ export default function AddVehicleForm() {
       .then((res) => res.json())
       .then((data) => {
         if (data) {
-          toast.success("Vehicle added successfully");
-          form.reset();
+          toast.success("Voertuig toegevoegd");
+          console.log(data);
         }
       })
-      .catch((error) => {
-        console.error(error);
-        toast.error("Failed to add vehicle");
-      });
+      .catch((error) => console.error(error));
   };
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      location_id: 1,
+      plate: "",
+      description: "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
+    form.reset();
+    submitVehicle(values);
+  }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="location_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Location ID</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(parseInt(e.target.value))}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="plate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Plate</FormLabel>
+              <FormLabel>Kenteken</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter plate" />
+                <Input placeholder="AB-123-CD" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -73,28 +106,23 @@ export default function AddVehicleForm() {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel htmlFor={field.name}>
+                Beschrijving (optioneel)
+              </FormLabel>
               <FormControl>
-                <Textarea {...field} placeholder="Enter description" />
+                <Textarea
+                  required={false}
+                  {...field}
+                  onChange={field.onChange}
+                  value={field.value}
+                  placeholder="Bijvoorbeeld: blauwe auto"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="location_id"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Location ID</FormLabel>
-              <FormControl>
-                <Input {...field} type="number" placeholder="Enter location ID" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button type="submit">Submit</Button>
+        <Button type="submit">Voeg voertuig toe</Button>
       </form>
     </Form>
   );
