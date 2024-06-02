@@ -33,11 +33,21 @@ export class ProductService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} product`;
+    return this.prisma.product.findUnique({
+      where: { id },
+      include: {
+        category: true,
+        items: true,
+        _count: { select: { items: true } },
+      },
+    });
   }
 
   update(id: number, updateProductDto: any) {
-    return `This action updates a #${id} product`;
+    return this.prisma.product.update({
+      where: { id },
+      data: updateProductDto,
+    });
   }
 
   remove(id: number) {
