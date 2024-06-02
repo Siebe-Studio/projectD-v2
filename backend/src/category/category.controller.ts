@@ -13,6 +13,7 @@ import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/auth/guards/roles.decorator';
 import { Category as CategoryModel } from '@prisma/client';
+import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
 
 @ApiTags('Category')
 @Controller('category')
@@ -31,7 +32,7 @@ export class CategoryController {
   @UseGuards(JwtGuard)
   async updateCategory(
     @Param('id', ParseIntPipe) id: number,
-    @Body() dto: { name: string },
+    @Body() dto: UpdateCategoryDto,
   ) {
     return await this.categoryService.update(id, dto);
   }
@@ -46,7 +47,7 @@ export class CategoryController {
   @Post()
   @Roles('STOCKMANAGER')
   @UseGuards(JwtGuard)
-  async createCategory(@Body() dto: { name: string }): Promise<CategoryModel> {
+  async createCategory(@Body() dto: CreateCategoryDto): Promise<CategoryModel> {
     return await this.categoryService.create(dto);
   }
 
