@@ -13,7 +13,13 @@ model User {
   name     String?
   password String
   role     String  @default("USER")
+
+  changes History[]
+
+  locationId Int?
+  location   Location? @relation(fields: [locationId], references: [id])
 }
+
 
 model Category {
   id       Int       @id @default(autoincrement())
@@ -38,9 +44,9 @@ model Item {
 
   productId Int
   product   Product @relation(fields: [productId], references: [id])
-
-  history History[]
-  // location
+  location_id    Int
+  location       Location @relation(fields: [location_id], references: [id])
+  history   History[]
 }
 
 model History {
@@ -50,17 +56,51 @@ model History {
   description String
   date        DateTime @default(now())
 
-  itemId String @unique
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  itemId String
   item   Item   @relation(fields: [itemId], references: [id])
 }
-
   model Vehicle {
-  id          String   @id @default(uuid()) 
+  id          String   @id @default(cuid())
   location_id Int
-  plate       String
+  plate       String @unique
   description String?
+  location    Location  @relation(fields: [location_id], references: [id])
+}
+model Location {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  vehicles Vehicle[]
+  items    Item[]
+  users    User[]
+
+  locationTypeId Int
+  locationType   LocationType @relation(fields: [locationTypeId], references: [id])
+
+  adress Adress?
 }
 
+model Adress {
+  id Int @id @default(autoincrement())
 
+  locationId Int      @unique
+  location   Location @relation(fields: [locationId], references: [id])
 
-  // location    Location  @relation(fields: [location_id], references: [id])
+  street String
+  number String
+  city   String
+  state  String
+  zip    String
+
+  phone String
+}
+
+model LocationType {
+  id       Int        @id @default(autoincrement())
+  location Location[]
+  name     String
+}
+

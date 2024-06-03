@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { VehicleTable, Vehicle } from "@/components/vehicles/VehicleTable";
 import AddVehicleDialog from "@/components/vehicles/AddVehicleDialog";
-  
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/products/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Vehicles() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -21,7 +20,7 @@ export default function Vehicles() {
       .then((data) => {
         if (data) {
           setVehicles(data);
-          console.log(data);
+          console.log(data); // Ensure data is logged correctly
         }
       })
       .catch((error) => console.error(error))

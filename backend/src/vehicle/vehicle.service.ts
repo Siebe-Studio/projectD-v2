@@ -8,13 +8,27 @@ export class VehicleService {
 
   async create(dto: CreateVehicleDto) {
     return await this.prisma.vehicle.create({
-      data: dto,
+      data: {
+        plate: dto.plate,
+        description: dto.description,
+        location: {
+          connect: {
+            id: dto.location_id,
+          },
+        },
+      },
     });
   }
 
   async findAll() {
     return this.prisma.vehicle.findMany({
       orderBy: { id: 'asc' },
+      select: {
+        id: true,
+        plate: true,
+        description: true,
+        location_id: true,
+      },
     });
   }
 
@@ -27,7 +41,15 @@ export class VehicleService {
   async update(id: string, dto: UpdateVehicleDto) {
     return this.prisma.vehicle.update({
       where: { id },
-      data: dto,
+      data: {
+        plate: dto.plate,
+        description: dto.description,
+        location: {
+          connect: {
+            id: dto.location_id,
+          },
+        },
+      },
     });
   }
 

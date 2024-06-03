@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Prisma, Item } from '@prisma/client';
-
+import { CreateItemDto, UpdateItemDto } from './dto/item.dto';
 
 @Injectable()
 export class ItemService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: { productId: number }) : Promise<Item> {
+  create(data: { productId: number, locationId: number }) : Promise<Item> {
     return this.prisma.item.create({
       data: {
         product: {
@@ -15,14 +15,19 @@ export class ItemService {
             id: data.productId,
           },
         },
+        location: {
+          connect: {
+            id: data.locationId,
+          },
+        },
       },
     });
   }
 
-
-  bulkCreate(data: { productId: number, quantity: number }) : Promise<any> {
+  bulkCreate(data: { productId: number; location_id: number; quantity: number }): Promise<any> {
     const items = Array.from({ length: data.quantity }).map(() => ({
       productId: data.productId,
+      location_id: data.location_id,
     }));
 
     return this.prisma.item.createMany({
@@ -30,34 +35,37 @@ export class ItemService {
     });
   }
 
-
-  findAll() : Promise<any> {
+  findAll(): Promise<any> {
     return this.prisma.item.findMany({
       include: {
         product: true,
-      },
-    })
-  }
-
-  findOne(id: string) : Promise<Item> {
-    return this.prisma.item.findUnique({
-      where: {
-        id,
+        location: true,
       },
     });
   }
 
-  update(id: string, data: Prisma.ItemUpdateInput) : Promise<Item> {
+  findOne(id: string): Promise<Item> {
+    return this.prisma.item.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        product: true,
+        location: true,
+      },
+    });
+  }
+
+  update(id: string, data: UpdateItemDto): Promise<Item> {
     return this.prisma.item.update({
       where: {
         id,
       },
       data,
-    })
+    });
   }
 
-
-  remove(id: string) : Promise<Item> {
+  remove(id: string): Promise<Item> {
     return this.prisma.item.delete({
       where: {
         id,

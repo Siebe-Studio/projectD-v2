@@ -12,10 +12,13 @@ import { JwtService } from '@nestjs/jwt';
 import { ItemModule } from './item/item.module';
 import { ProductModule } from './product/product.module';
 import { VehicleModule } from './vehicle/vehicle.module';
+import { LocationService } from './location/location.service';
+import { LocationController } from './location/location.controller';
+import { LocationModule } from './location/locatio.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UserModule, AuthModule, CategoryModule, ItemModule, ProductModule, VehicleModule],
-  controllers: [AppController, CategoryController],
-  providers: [AppService, PrismaService, JwtService, CategoryService],
+  imports: [ConfigModule.forRoot(), UserModule, AuthModule, CategoryModule, ItemModule, ProductModule, VehicleModule, LocationModule, LocationModule],
+  controllers: [AppController, CategoryController, LocationController],
+  providers: [AppService, PrismaService, JwtService, CategoryService, LocationService],
 })
 export class AppModule {}

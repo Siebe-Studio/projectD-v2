@@ -1,9 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/products/ui/button";
 import {
   Form,
@@ -17,26 +16,25 @@ import {
 import { Input } from "@/components/products/ui/input";
 import { Textarea } from "@/components/products/ui/textarea";
 import { toast } from "sonner";
-
 import React, { useEffect, useState } from "react";
 
 const formSchema = z.object({
   location_id: z.number({
     required_error: "Locatie ID is verplicht",
-  }),
+  }).int(),
   plate: z.string().min(2, {
     message: "Kenteken moet minimaal 2 karakters bevatten",
   }),
   description: z.string().max(255, {
     message: "Maximaal 255 karakters",
-  }),
+  }).optional(),
 });
 
 export default function AddVehicleForm() {
   const [postVehicle, setPostVehicle] = useState<any>();
 
   const submitVehicle = (values: any) => {
-    fetch("http://localhost:8000/vehicle", {
+    fetch("http://localhost:8000/vehicles", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
