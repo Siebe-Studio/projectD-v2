@@ -1,23 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Prisma } from '@prisma/client';
+import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 
 @Injectable()
 export class ProductService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: {
-    name: string;
-    description?: string;
-    price: number;
-    categoryId: number;
-  }) {
+  create(dto: CreateProductDto) {
     return this.prisma.product.create({
       data: {
-        name: data.name,
-        description: data.description,
-        price: data.price,
-        categoryId: data.categoryId,
+        name: dto.name,
+        description: dto.description,
+        price: dto.price,
+        categoryId: dto.categoryId,
       },
       include: {
         category: true,
@@ -48,14 +44,17 @@ export class ProductService {
     });
   }
 
-  update(id: number, updateProductDto: any) {
+  update(id: number, updateProductDto: UpdateProductDto) {
     return this.prisma.product.update({
       where: { id },
       data: updateProductDto,
     });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} product`;
+  remove(id: number, items: boolean) {
+    return this.prisma.product.delete({
+      where: { id },
+      include: { items: items ? true : false },
+    });
   }
 }

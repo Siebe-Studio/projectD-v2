@@ -6,9 +6,11 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 
 @ApiTags('Product')
 @Controller('product')
@@ -18,14 +20,9 @@ export class ProductController {
   @Post()
   create(
     @Body()
-    data: {
-      name: string;
-      description?: string;
-      price: number;
-      categoryId: number;
-    },
+    dto: CreateProductDto,
   ) {
-    return this.productService.create(data);
+    return this.productService.create(dto);
   }
 
   @Get()
@@ -33,9 +30,9 @@ export class ProductController {
     return this.productService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.productService.findOne(+id);
+  @Delete(':id')
+  remove(@Param('id') id: string, @Query('items') name: boolean) {
+    return this.productService.remove(+id, name);
   }
 
   @Patch(':id')
@@ -43,8 +40,8 @@ export class ProductController {
     return this.productService.update(+id, updateProductDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productService.remove(+id);
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.productService.findOne(+id);
   }
 }
