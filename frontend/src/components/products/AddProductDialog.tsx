@@ -10,7 +10,7 @@ import {
 } from "@/components/products/ui/dialog"
 import AddProductForm from "./AddProductForm"
 
-export default function AddProductDialog() {
+export default function AddProductDialog({ handleAddProduct} : { handleAddProduct: Function}) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -24,7 +24,7 @@ export default function AddProductDialog() {
           </DialogDescription>
         </DialogHeader>
 
-        <AddProductForm/>
+        <AddProductForm handleAddProduct={handleAddProduct} />
       </DialogContent>
     </Dialog>
   )

@@ -19,6 +19,11 @@ export class ProductService {
         price: data.price,
         categoryId: data.categoryId,
       },
+      include: {
+        category: true,
+        items: true,
+        _count: { select: { items: true } },
+      }
     });
   }
 

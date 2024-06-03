@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/products/ui/select";
-import { toast } from "sonner"
+import { toast } from "sonner";
 
 import React, { useEffect, useState } from "react";
 
@@ -35,16 +35,19 @@ const formSchema = z.object({
     message: "Maximaal 255 karakters",
   }),
   price: z.coerce.number().int().positive({
-    message: "Moet hoger dan 0 zijn"
+    message: "Moet hoger dan 0 zijn",
   }),
   categoryId: z.coerce.number().int().positive({
     message: "Categorie is verplicht",
   }),
 });
 
-export default function AddProductForm() {
+export default function AddProductForm({
+  handleAddProduct,
+}: {
+  handleAddProduct: Function;
+}) {
   const [categories, setCategories] = useState<any[]>([]);
-  const [postProduct, setPostProduct] = useState<any>();
 
   const [loading, setLoading] = useState(true);
   const submitProduct = (values: any) => {
@@ -58,6 +61,13 @@ export default function AddProductForm() {
       .then((res) => res.json())
       .then((data) => {
         if (data) {
+          try{
+            handleAddProduct(data);
+          }
+          catch(e){
+            console.error(e);
+            toast.error("Product kon niet worden toegevoegd, probeer opnieuw");
+          }
           toast.success("Product toegevoegd");
           console.log(data);
         }

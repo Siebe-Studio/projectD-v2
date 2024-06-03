@@ -20,6 +20,11 @@ export default function Products() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+
+  function handleAddProduct(product: any) {
+    setProducts([...products, product]);
+  }
+
   useEffect(() => {
     fetch("http://localhost:8000/product", {
       method: "GET",
@@ -46,7 +51,7 @@ export default function Products() {
             <CardTitle>Product toevoegen</CardTitle>
           </CardHeader>
             <CardContent>
-                <AddProductDialog/>
+                <AddProductDialog handleAddProduct={handleAddProduct}/>
             </CardContent>
         </Card>
       </div>
