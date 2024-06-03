@@ -8,7 +8,7 @@ async function main() {
     data: {
       plate: 'AB-123-CD',
       description: 'Een blauwe auto',
-      location_id: 1,  
+      locationId: 1,  
     },
   });
 
@@ -16,7 +16,7 @@ async function main() {
     data: {
       plate: 'EF-456-GH',
       description: 'Een rode vrachtwagen',
-      location_id: 2, 
+      locationId: 2, 
     },
   });
 

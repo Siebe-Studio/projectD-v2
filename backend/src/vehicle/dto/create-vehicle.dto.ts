@@ -4,7 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateVehicleDto {
   @ApiProperty()
   @IsInt()
-  location_id: number;
+  id: number;
 
   @ApiProperty()
   @IsString()
@@ -14,4 +14,8 @@ export class CreateVehicleDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiProperty()
+  @IsInt()
+  locationId: number;
 }

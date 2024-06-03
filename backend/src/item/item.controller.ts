@@ -23,14 +23,14 @@ export class ItemController {
   @Post()
   @Roles('STOCKMANAGER')
   @UseGuards(JwtGuard)
-  create(@Body() data: { productId: number }) {
+  create(@Body() data: { productId: number, locationId: number}) {
     return this.itemService.create(data);
   }
 
   @Post('bulk')
   @Roles('STOCKMANAGER')
   @UseGuards(JwtGuard)
-  bulkCreate(@Body() data: { productId: number; quantity: number }) {
+  bulkCreate(@Body() data: { productId: number; quantity: number, locationId: number}) {
     return this.itemService.bulkCreate(data);
   }
 

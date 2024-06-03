@@ -7,7 +7,7 @@ import { Prisma, Item } from '@prisma/client';
 export class ItemService {
   constructor(private prisma: PrismaService) {}
 
-  create(data: { productId: number }) : Promise<Item> {
+  create(data: { productId: number, locationId: number }) : Promise<Item> {
     return this.prisma.item.create({
       data: {
         product: {
@@ -15,14 +15,20 @@ export class ItemService {
             id: data.productId,
           },
         },
+        location: {
+          connect: {
+            id: data.locationId,
+          },
+        },
       },
     });
   }
 
 
-  bulkCreate(data: { productId: number, quantity: number }) : Promise<any> {
+  bulkCreate(data: { productId: number, quantity: number, locationId: number }) : Promise<any> {
     const items = Array.from({ length: data.quantity }).map(() => ({
       productId: data.productId,
+      locationId: data.locationId,
     }));
 
     return this.prisma.item.createMany({

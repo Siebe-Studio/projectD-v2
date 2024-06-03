@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("postgres://postgres.ivkcringedaqfzmgzcxr:iBbCL8zV4hkp286j@aws-0-eu-west-1.pooler.supabase.com:5432/postgres")
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -13,6 +13,11 @@ model User {
   name     String?
   password String
   role     String  @default("USER")
+
+  changes History[]
+
+  locationId Int?
+  location   Location? @relation(fields: [locationId], references: [id])
 }
 
 model Category {
@@ -39,15 +44,18 @@ model Item {
   productId Int
   product   Product @relation(fields: [productId], references: [id])
 
-  history History[]
-  // location
+  locationId Int
+  location   Location  @relation(fields: [locationId], references: [id])
+  history    History[]
 }
+
 model Vehicle {
-  id          Int      @id @default(autoincrement())
-  location_id Int
+  id          Int     @id @default(autoincrement())
   plate       String
   description String?
-  // location    Location  @relation(fields: [location_id], references: [id])
+
+  locationId Int
+  location   Location @relation(fields: [locationId], references: [id])
 }
 
 model History {
@@ -57,6 +65,44 @@ model History {
   description String
   date        DateTime @default(now())
 
-  itemId String @unique
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  itemId String
   item   Item   @relation(fields: [itemId], references: [id])
+}
+
+model Location {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  vehicles Vehicle[]
+  items    Item[]
+  users    User[]
+
+  locationTypeId Int
+  locationType   LocationType @relation(fields: [locationTypeId], references: [id])
+
+  adress Adress?
+}
+
+model Adress {
+  id Int @id @default(autoincrement())
+
+  locationId Int      @unique
+  location   Location @relation(fields: [locationId], references: [id])
+
+  street String
+  number String
+  city   String
+  state  String
+  zip    String
+
+  phone String
+}
+
+model LocationType {
+  id       Int        @id @default(autoincrement())
+  location Location[]
+  name     String
 }
