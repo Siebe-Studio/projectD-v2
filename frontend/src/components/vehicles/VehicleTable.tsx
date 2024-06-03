@@ -3,58 +3,64 @@
 import * as React from "react";
 import {
   ColumnDef,
+  ColumnFiltersState,
+  SortingState,
+  VisibilityState,
+  flexRender,
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-  flexRender,
-  SortingState,
-  ColumnFiltersState,
-  VisibilityState,
-  RowSelectionState,
 } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
-
-import { Button } from "@/components/products/ui/button";
-import { Input } from "@/components/products/ui/input";
+import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/products/ui/dropdown-menu";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/products/ui/table";
-
-import { useState } from "react";
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import UpdateVehicleDialog from "./UpdateVehicleDialog";
 import { toast } from "sonner";
 
 export type Vehicle = {
-  id: number;
-  location_id: number;
+  id: string;
   plate: string;
   description: string;
+  location_id: number;
 };
 
 export const columns: ColumnDef<Vehicle>[] = [
   {
-    accessorKey: "id",
-    header: "ID",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
   },
   {
-    accessorKey: "location_id",
-    header: "Locatie ID",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("location_id")}</div>,
+    accessorKey: "id",
+    header: "Id",
+    cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
   },
   {
     accessorKey: "plate",
@@ -63,13 +69,56 @@ export const columns: ColumnDef<Vehicle>[] = [
   },
   {
     accessorKey: "description",
-    header: "Beschrijving",
+    header: "Omschrijving",
     cell: ({ row }) => <div className="capitalize">{row.getValue("description")}</div>,
   },
   {
+    accessorKey: "location_id",
+    header: "Locatie ID",
+    cell: ({ row }) => <div className="capitalize">{row.getValue("location_id")}</div>,
+  },
+  {
+    accessorKey: "Update",
+    header: "Update",
+    cell: ({ row }) => (
+      <div className="capitalize">
+        <UpdateVehicleDialog vehicle={row.original} />
+      </div>
+    ),
+  },
+  {
     id: "actions",
+    enableHiding: false,
     cell: ({ row }) => {
       const vehicle = row.original;
+
+      const deleteVehicle = async (vehicleId: string) => {
+        const response = await fetch(`http://localhost:8000/vehicles/${vehicleId}`, {
+          method: "DELETE",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to delete vehicle");
+        }
+
+        return response.json();
+      };
+
+      const handleDeleteVehicle = async (vehicleId: string) => {
+        const confirmation = window.confirm("Weet je zeker dat je dit voertuig wilt verwijderen?");
+
+        if (confirmation) {
+          try {
+            await deleteVehicle(vehicleId);
+            toast.success("Voertuig verwijderd");
+            // Fetch and update the data again
+          } catch (error) {
+            console.log(error);
+            alert("Er is een fout opgetreden bij het verwijderen van het voertuig");
+          }
+        }
+      };
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -80,26 +129,11 @@ export const columns: ColumnDef<Vehicle>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Acties</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={async () => {
-                try {
-                  const response = await fetch(`http://localhost:8000/vehicle/${vehicle.id}`, {
-                    method: "DELETE",
-                  });
-                  if (response.ok) {
-                    toast.success("Voertuig verwijderd");
-                    setTimeout(() => {
-                      window.location.reload();
-                    }, 1500); 
-                  } else {
-                    toast.error("Fout bij het verwijderen van voertuig");
-                  }
-                } catch (error) {
-                  toast.error("Fout bij het verwijderen van voertuig");
-                }
-              }}
-            >
-              Verwijderen
+            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(vehicle.id.toString())}>
+              Kopieer voertuig ID
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDeleteVehicle(vehicle.id)}>
+              Verwijder voertuig
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </DropdownMenuContent>
@@ -110,28 +144,28 @@ export const columns: ColumnDef<Vehicle>[] = [
 ];
 
 export function VehicleTable({ data }: { data: Vehicle[] }) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = React.useState({});
 
   const table = useReactTable({
     data,
     columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
     },
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
   });
 
   return (
@@ -140,34 +174,31 @@ export function VehicleTable({ data }: { data: Vehicle[] }) {
         <Input
           placeholder="Zoek voertuig op kenteken..."
           value={(table.getColumn("plate")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("plate")?.setFilterValue(event.target.value)
-          }
+          onChange={(event) => table.getColumn("plate")?.setFilterValue(event.target.value)}
           className="max-w-sm"
         />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
-              Kolommen <ArrowUpDown className="ml-2 h-4 w-4" />
+              Kolommen <ChevronDown className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()
               .filter((column) => column.getCanHide())
-              .map((column) => (
-                <DropdownMenuItem key={column.id}>
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={column.getIsVisible()}
-                      onChange={() => column.toggleVisibility()}
-                      className="form-checkbox"
-                    />
-                    <span>{column.id}</span>
-                  </label>
-                </DropdownMenuItem>
-              ))}
+              .map((column) => {
+                return (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
+                  >
+                    {column.id}
+                  </DropdownMenuCheckboxItem>
+                );
+              })}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -176,20 +207,22 @@ export function VehicleTable({ data }: { data: Vehicle[] }) {
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder ? null : (
-                      <div>{flexRender(header.column.columnDef.header, header.getContext())}</div>
-                    )}
-                  </TableHead>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(header.column.columnDef.header, header.getContext())}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
             ))}
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                   ))}
@@ -197,13 +230,36 @@ export function VehicleTable({ data }: { data: Vehicle[] }) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="text-center">
-                  Geen gegevens gevonden.
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  No results.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <div className="flex-1 text-sm text-muted-foreground">
+          {table.getFilteredSelectedRowModel().rows.length} van de {table.getFilteredRowModel().rows.length} rij(en) geselecteerd.
+        </div>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Vorige
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Volgende
+          </Button>
+        </div>
       </div>
     </div>
   );

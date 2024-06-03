@@ -1,35 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { CreateVehicleDto } from './dto/create-vehicle.dto';
+import { CreateVehicleDto, UpdateVehicleDto } from './dto/vehicle.dto';
 
 @Injectable()
 export class VehicleService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createVehicleDto: CreateVehicleDto) {
-    return this.prisma.vehicle.create({
-      data: createVehicleDto,
+  async create(dto: CreateVehicleDto) {
+    return await this.prisma.vehicle.create({
+      data: dto,
     });
   }
 
   async findAll() {
-    return this.prisma.vehicle.findMany();
+    return this.prisma.vehicle.findMany({
+      orderBy: { id: 'asc' },
+    });
   }
 
-  async findOne(id: number) {
-    return this.prisma.vehicle.findUnique({
+  async findOne(id: string) {
+    return await this.prisma.vehicle.findUnique({
       where: { id },
     });
   }
 
-  async update(id: number, updateVehicleDto: CreateVehicleDto) {
+  async update(id: string, dto: UpdateVehicleDto) {
     return this.prisma.vehicle.update({
       where: { id },
-      data: updateVehicleDto,
+      data: dto,
     });
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     return this.prisma.vehicle.delete({
       where: { id },
     });

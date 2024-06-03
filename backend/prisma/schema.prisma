@@ -42,13 +42,6 @@ model Item {
   history History[]
   // location
 }
-model Vehicle {
-  id          Int      @id @default(autoincrement())
-  location_id Int
-  plate       String
-  description String?
-  // location    Location  @relation(fields: [location_id], references: [id])
-}
 
 model History {
   id Int @id @default(autoincrement())
@@ -60,3 +53,14 @@ model History {
   itemId String @unique
   item   Item   @relation(fields: [itemId], references: [id])
 }
+
+  model Vehicle {
+  id          String   @id @default(uuid()) 
+  location_id Int
+  plate       String
+  description String?
+}
+
+
+
+  // location    Location  @relation(fields: [location_id], references: [id])

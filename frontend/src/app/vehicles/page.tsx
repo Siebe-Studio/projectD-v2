@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { VehicleTable, Vehicle } from "@/components/vehicles/VehicleTable";
 import AddVehicleDialog from "@/components/vehicles/AddVehicleDialog";
-
+  
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/products/ui/card";
 
 export default function Vehicles() {
@@ -11,7 +11,7 @@ export default function Vehicles() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8000/vehicle", {
+    fetch("http://localhost:8000/vehicles", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
