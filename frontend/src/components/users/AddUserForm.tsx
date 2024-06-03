@@ -109,7 +109,7 @@ const form = useForm<z.infer<typeof formSchema>>({
                 Wachtwoord
               </FormLabel>
               <FormControl>
-                <input
+                <Input
                     type = "password"
                     required
                     {...field}
