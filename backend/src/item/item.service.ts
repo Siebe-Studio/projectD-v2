@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Prisma, Item } from '@prisma/client';
 import { CreateItemDto, UpdateItemDto } from './dto/item.dto';
@@ -24,10 +24,10 @@ export class ItemService {
     });
   }
 
-  bulkCreate(data: { productId: number; location_id: number; quantity: number }): Promise<any> {
+  bulkCreate(data: { productId: number; locationId: number; quantity: number }): Promise<any> {
     const items = Array.from({ length: data.quantity }).map(() => ({
       productId: data.productId,
-      location_id: data.location_id,
+      locationId: data.locationId,
     }));
 
     return this.prisma.item.createMany({
@@ -71,5 +71,23 @@ export class ItemService {
         id,
       },
     });
+  }
+
+  async assignItemToVehicle(itemId: string, vehicleId: string): Promise<Item> {
+    const vehicle = await this.prisma.vehicle.findUnique({
+      where: { id: vehicleId },
+      include: { location: true }
+    });
+
+    if (!vehicle) {
+      throw new NotFoundException('Vehicle not found');
+    }
+
+    const updatedItem = await this.prisma.item.update({
+      where: { id: itemId },
+      data: { locationId: vehicle.location_id }
+    });
+
+    return updatedItem;
   }
 }

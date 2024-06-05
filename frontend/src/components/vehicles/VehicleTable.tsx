@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState, useEffect } from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -13,22 +13,19 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import UpdateVehicleDialog from "./UpdateVehicleDialog";
-import { toast } from "sonner";
+import VehicleItems from "./VehicleItems";
 
 export type Vehicle = {
   id: string;
@@ -37,117 +34,139 @@ export type Vehicle = {
   location_id: number;
 };
 
-export const columns: ColumnDef<Vehicle>[] = [
-  {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "id",
-    header: "Id",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
-  },
-  {
-    accessorKey: "plate",
-    header: "Kenteken",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("plate")}</div>,
-  },
-  {
-    accessorKey: "description",
-    header: "Omschrijving",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("description")}</div>,
-  },
-  {
-    accessorKey: "location_id",
-    header: "Locatie ID",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("location_id")}</div>,
-  },
-  {
-    accessorKey: "Update",
-    header: "Update",
-    cell: ({ row }) => (
-      <div className="capitalize">
-        <UpdateVehicleDialog vehicle={row.original} />
+type VehicleTableProps = {
+  data: Vehicle[];
+};
+
+interface Item {
+  id: string;
+  name: string;
+}
+
+interface AddItemFormProps {
+  vehicleId: string;
+}
+
+function AddItemForm({ vehicleId }: AddItemFormProps) {
+  const [items, setItems] = useState<Item[]>([]);
+  const [selectedItemId, setSelectedItemId] = useState<string>("");
+
+  useEffect(() => {
+    fetch("http://localhost:8000/items")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setItems(data);
+        } else {
+          setItems([]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching items:", error);
+        setItems([]);
+      });
+  }, []);
+
+  const handleAddItem = () => {
+    fetch(`http://localhost:8000/item/${selectedItemId}/assign-to-vehicle/${vehicleId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Item added to vehicle:", data);
+      })
+      .catch((error) => {
+        console.error("Error adding item to vehicle:", error);
+      });
+  };
+
+  return (
+    <div>
+      <h4>Voeg een item toe aan voertuig {vehicleId}</h4>
+      <div>
+        <label htmlFor="itemId">Item ID</label>
+        <select id="itemId" value={selectedItemId} onChange={(e) => setSelectedItemId(e.target.value)}>
+          <option value="">Selecteer een item</option>
+          {items.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
       </div>
-    ),
-  },
-  {
-    id: "actions",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const vehicle = row.original;
+      <button onClick={handleAddItem}>Voeg Item Toe</button>
+    </div>
+  );
+}
 
-      const deleteVehicle = async (vehicleId: string) => {
-        const response = await fetch(`http://localhost:8000/vehicles/${vehicleId}`, {
-          method: "DELETE",
-        });
+export function VehicleTable({ data }: VehicleTableProps) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [rowSelection, setRowSelection] = useState({});
+  const [selectedVehicleId, setSelectedVehicleId] = useState<string | null>(null);
 
-        if (!response.ok) {
-          throw new Error("Failed to delete vehicle");
-        }
-
-        return response.json();
-      };
-
-      const handleDeleteVehicle = async (vehicleId: string) => {
-        const confirmation = window.confirm("Weet je zeker dat je dit voertuig wilt verwijderen?");
-
-        if (confirmation) {
-          try {
-            await deleteVehicle(vehicleId);
-            toast.success("Voertuig verwijderd");
-            // Fetch and update the data again
-          } catch (error) {
-            console.log(error);
-            alert("Er is een fout opgetreden bij het verwijderen van het voertuig");
-          }
-        }
-      };
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Acties</DropdownMenuLabel>
-            <DropdownMenuItem onClick={() => navigator.clipboard.writeText(vehicle.id.toString())}>
-              Kopieer voertuig ID
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleDeleteVehicle(vehicle.id)}>
-              Verwijder voertuig
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+  const columns: ColumnDef<Vehicle>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && "indeterminate")}
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableHiding: false,
     },
-  },
-];
-
-export function VehicleTable({ data }: { data: Vehicle[] }) {
-  const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-  const [rowSelection, setRowSelection] = React.useState({});
+    {
+      accessorKey: "id",
+      header: "Id",
+      cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
+    },
+    {
+      accessorKey: "plate",
+      header: "Kenteken",
+      cell: ({ row }) => <div className="capitalize">{row.getValue("plate")}</div>,
+    },
+    {
+      accessorKey: "description",
+      header: "Omschrijving",
+      cell: ({ row }) => <div className="capitalize">{row.getValue("description")}</div>,
+    },
+    {
+      accessorKey: "location_id",
+      header: "Locatie ID",
+      cell: ({ row }) => <div className="capitalize">{row.getValue("location_id")}</div>,
+    },
+    {
+      accessorKey: "update",
+      header: "Update",
+      cell: ({ row }) => (
+        <div className="flex space-x-2">
+          <UpdateVehicleDialog vehicle={row.original} />
+          <Button onClick={() => setSelectedVehicleId(row.original.id)}>Edit Items</Button>
+        </div>
+      ),
+    },
+    {
+      accessorKey: "actions",
+      header: "Items",
+      cell: ({ row }) => (
+        <Button onClick={() => setSelectedVehicleId(row.original.id)}>Items</Button>
+      ),
+    },
+  ];
 
   const table = useReactTable({
     data,
@@ -238,6 +257,12 @@ export function VehicleTable({ data }: { data: Vehicle[] }) {
           </TableBody>
         </Table>
       </div>
+      {selectedVehicleId && (
+        <>
+          <VehicleItems vehicleId={selectedVehicleId} />
+          <AddItemForm vehicleId={selectedVehicleId} />
+        </>
+      )}
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} van de {table.getFilteredRowModel().rows.length} rij(en) geselecteerd.

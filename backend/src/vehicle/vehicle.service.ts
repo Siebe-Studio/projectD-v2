@@ -58,4 +58,23 @@ export class VehicleService {
       where: { id },
     });
   }
+  async getItemsByVehicle(vehicleId: string) {
+    const vehicle = await this.prisma.vehicle.findUnique({
+      where: { id: vehicleId },
+      include: {
+        location: {
+          include: {
+            items: true,
+          },
+        },
+      },
+    });
+
+    if (!vehicle) {
+      // throw new NotFoundException('Vehicle not found');
+    }
+
+    return vehicle.location.items;
+  }
+
 }

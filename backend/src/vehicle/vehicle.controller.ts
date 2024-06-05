@@ -84,4 +84,10 @@ export class VehicleController {
       throw error;
     }
   }
+
+  @Get(':vehicleId/items')
+  async getItemsByVehicle(@Param('vehicleId') vehicleId: string) {
+    return this.vehicleService.getItemsByVehicle(vehicleId);
+  }
+
 }

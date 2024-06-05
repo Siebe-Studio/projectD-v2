@@ -14,12 +14,11 @@ model User {
   password String
   role     String  @default("USER")
 
-  changes History[]
+  history History[] 
 
   locationId Int?
   location   Location? @relation(fields: [locationId], references: [id])
 }
-
 
 model Category {
   id       Int       @id @default(autoincrement())
@@ -44,31 +43,31 @@ model Item {
 
   productId Int
   product   Product @relation(fields: [productId], references: [id])
-  location_id    Int
-  location       Location @relation(fields: [location_id], references: [id])
+  locationId    Int?
+  location      Location? @relation(fields: [locationId], references: [id])
+
   history   History[]
 }
 
 model History {
-  id Int @id @default(autoincrement())
-
-  title       String
-  description String
-  date        DateTime @default(now())
-
-  userId String?
-  user   User?   @relation(fields: [userId], references: [id])
-
-  itemId String
-  item   Item   @relation(fields: [itemId], references: [id])
+  id          Int      @id @default(autoincrement())
+  itemId      String
+  item        Item     @relation(fields: [itemId], references: [id])
+  origin      Int
+  destination Int
+  userId      Int
+  user        User[]
+  timestamp   DateTime @default(now())
 }
-  model Vehicle {
+
+model Vehicle {
   id          String   @id @default(cuid())
   location_id Int
   plate       String @unique
   description String?
   location    Location  @relation(fields: [location_id], references: [id])
 }
+
 model Location {
   id   Int    @id @default(autoincrement())
   name String
@@ -103,4 +102,3 @@ model LocationType {
   location Location[]
   name     String
 }
-

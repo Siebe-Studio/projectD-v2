@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Prisma } from '@prisma/client';
 
@@ -53,4 +53,38 @@ export class ProductService {
   remove(id: number) {
     return `This action removes a #${id} product`;
   }
+
+  // async assignProductToVehicle(productId: string, vehicleId: string) {
+  //   const parsedProductId = parseInt(productId, 10);
+  //   const parsedVehicleId = parseInt(vehicleId, 10);
+
+  //   if (isNaN(parsedProductId) || isNaN(parsedVehicleId)) {
+  //     throw new NotFoundException('Invalid product or vehicle ID');
+  //   }
+
+  //   const vehicle = await this.prisma.vehicle.findUnique({
+  //     where: { id: parsedVehicleId },
+  //     include: { location: true },
+  //   });
+
+  //   if (!vehicle) {
+  //     throw new NotFoundException('Vehicle not found');
+  //   }
+
+  //   const items = await this.prisma.item.findMany({
+  //     where: { productId: parsedProductId },
+  //   });
+
+  //   if (items.length === 0) {
+  //     throw new NotFoundException('No items found for this product');
+  //   }
+
+  //   const updatedItems = await this.prisma.item.updateMany({
+  //     where: { productId: parsedProductId },
+  //     data: { locationId: vehicle.location_id },
+  //   });
+
+  //   return updatedItems;
+  // }
 }
+
