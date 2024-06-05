@@ -12,6 +12,7 @@ import {
   Bus,
   Users,
   CircleUser,
+  MapPin,
 } from "lucide-react";
 
 import { Badge } from "@/components/products/ui/badge";
@@ -68,7 +69,7 @@ export default function Dashboard({ children} : { children: React.ReactNode}) {
                 <Home className="h-4 w-4" />
                 Dashboard
               </Link>
-              <Link
+              {/*<Link
                 href="#"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
@@ -77,7 +78,7 @@ export default function Dashboard({ children} : { children: React.ReactNode}) {
                 <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
                   6
                 </Badge>
-              </Link>
+              </Link> */}
               <Link
                 href="/producten"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-primary transition-all hover:text-primary"
@@ -98,6 +99,13 @@ export default function Dashboard({ children} : { children: React.ReactNode}) {
               >
                 <LineChart className="h-4 w-4" />
                 Analytica
+              </Link>
+              <Link
+                href="/locations"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-primary transition-all hover:text-primary"
+              >
+                <MapPin className="h-4 w-4" />
+                Locaties
               </Link>
               <Link
                 href="/vehicles"
@@ -165,16 +173,12 @@ export default function Dashboard({ children} : { children: React.ReactNode}) {
                 <Home className="h-5 w-5" />
                 Dashboard
               </Link>
-              <Link
-                href="#"
-                className="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground"
-              >
+              {/*<Link
+                href="#" className="mx-[-0.65rem] flex items-center gap-4 rounded-xl bg-muted px-3 py-2 text-foreground hover:text-foreground">
                 <Bus className="h-5 w-5" />
                 Preparatie
-                <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">
-                  6
-                </Badge>
-              </Link>
+                <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">6</Badge>
+              </Link> */}
               <Link
                 href="#"
                 className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
