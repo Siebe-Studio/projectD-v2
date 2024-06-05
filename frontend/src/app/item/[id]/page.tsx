@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ItemDetails } from "@/components/items/ItemDetails"; // Adjust import path as necessary
+import { ItemDetails } from "@/components/items/ItemDetails"; 
 
 export default function ItemPage({ params }: { params: { id: string } }) {
   const { id } = params;

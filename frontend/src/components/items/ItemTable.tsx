@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import { ChevronDown, MoreHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -38,6 +38,14 @@ import {
 
 import Link from "next/link";
 
+export type History = {
+  id: number;
+  title: string;
+  description: string;
+  date: Date;
+  itemId: string;
+};
+
 export type Item = {
   id: string;
   serialNumber: string;
@@ -56,12 +64,6 @@ export type Product = {
     name: string;
   };
   items: Item[];
-};
-
-export type History = {
-  id: string;
-  location: string;
-  // Add more fields as needed
 };
 
 // Define the columns
@@ -95,17 +97,17 @@ export const columns: ColumnDef<Item>[] = [
   },
   {
     accessorKey: "serialNumber",
-    header: "Serienummer",
+    header: "Serial Number",
     cell: ({ row }) => <div className="capitalize">{row.getValue("serialNumber")}</div>,
   },
   {
     accessorKey: "history",
-    accessorFn: (item) => item.history.map((h) => h.location)[0],
-    header: "Locatie",
+    accessorFn: (item) => item.history.map((h) => h.title)[0], // Adjust according to your data
+    header: "History",
     cell: ({ row }) => <div className="capitalize">{row.getValue("history")}</div>,
   },
   {
-    id: "acties",
+    id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
       const item = row.original;
@@ -122,7 +124,7 @@ export const columns: ColumnDef<Item>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem>
               <Link href={`/items/${item.id}`}>
-                Bekijk Item
+                View Item
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -142,11 +144,11 @@ export function ItemTable({ productId }: { productId: number }) {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    fetch(`http://localhost:8000/product/${productId}`)
+    fetch(`http://localhost:8000/item?productId=${productId}`)
       .then((res) => res.json())
       .then((data) => {
-        if (data && data.items) {
-          setItems(data.items);
+        if (data) {
+          setItems(data);
         }
       })
       .catch((error) => console.error(error))
@@ -176,7 +178,7 @@ export function ItemTable({ productId }: { productId: number }) {
     <div className="w-full">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Zoek naar serienummer..."
+          placeholder="Search by serial number..."
           value={(table.getColumn("serialNumber")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("serialNumber")?.setFilterValue(event.target.value)
@@ -250,7 +252,7 @@ export function ItemTable({ productId }: { productId: number }) {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  Geen resultaten.
+                  No results.
                 </TableCell>
               </TableRow>
             )}
@@ -259,8 +261,8 @@ export function ItemTable({ productId }: { productId: number }) {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} van{" "}
-          {table.getFilteredRowModel().rows.length} rij(en) geselecteerd.
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
         <div className="space-x-2">
           <Button
@@ -269,7 +271,7 @@ export function ItemTable({ productId }: { productId: number }) {
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Vorige
+            Previous
           </Button>
           <Button
             variant="outline"
@@ -277,7 +279,7 @@ export function ItemTable({ productId }: { productId: number }) {
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Volgende
+            Next
           </Button>
         </div>
       </div>

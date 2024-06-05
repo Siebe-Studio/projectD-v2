@@ -21,8 +21,8 @@ export class ItemService {
 
   async bulkCreate(data: { productId: number; quantity: number }): Promise<any> {
     const items = Array.from({ length: data.quantity }).map(() => ({
-      productId: data.productId,
       serialNumber: generateUniqueSerialNumber(),
+      productId: data.productId,
     }));
 
     return this.prisma.item.createMany({
@@ -34,6 +34,7 @@ export class ItemService {
     return this.prisma.item.findMany({
       include: {
         product: true,
+        history: true,  // Include history in the response
       },
     });
   }
@@ -43,6 +44,7 @@ export class ItemService {
       where: { id },
       include: {
         product: true,
+        history: true,  // Include history in the response
       },
     });
     if (!item) {

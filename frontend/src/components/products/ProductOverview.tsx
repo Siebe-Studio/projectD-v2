@@ -27,7 +27,7 @@ export function ProductOverview({ products }: { products: Product[] }) {
             Price: {new Intl.NumberFormat("en-US", { style: "currency", currency: "EUR" }).format(product.price)}
           </p>
           <Link href={`/producten/${product.id}`}>
-            <a className="text-blue-500 hover:underline">View Details</a>
+            <a className="text-blue-500 hover:underline">Bekijk details</a>
           </Link>
         </div>
       ))}
