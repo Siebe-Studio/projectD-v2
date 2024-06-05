@@ -11,8 +11,6 @@ export class UserController {
     constructor(private userService: UserService) {}
 
     @Get(":id")
-    // @Roles('ADMIN')
-    // @UseGuards(JwtGuard)
     async getUserProfile(@Param('id') id: string) {
         return await this.userService.findById(id);
     }

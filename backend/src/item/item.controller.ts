@@ -21,36 +21,26 @@ export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
   @Post()
-  @Roles('STOCKMANAGER')
-  @UseGuards(JwtGuard)
   create(@Body() data: { productId: number, locationId: number}) {
     return this.itemService.create(data);
   }
 
   @Post('bulk')
-  @Roles('STOCKMANAGER')
-  @UseGuards(JwtGuard)
   bulkCreate(@Body() data: { productId: number; quantity: number, locationId: number}) {
     return this.itemService.bulkCreate(data);
   }
 
   @Get()
-  @Roles('STOCKMANAGER')
-  @UseGuards(JwtGuard)
   findAll() {
     return this.itemService.findAll();
   }
 
   @Get(':id')
-  @Roles('STOCKMANAGER')
-  @UseGuards(JwtGuard)
   findOne(@Param('id') id: string) {
     return this.itemService.findOne(id);
   }
 
   @Patch(':id')
-  @Roles('STOCKMANAGER')
-  @UseGuards(JwtGuard)
   update(
     @Param('id') id: string,
     @Body() data: Prisma.ItemUpdateInput,
@@ -59,8 +49,6 @@ export class ItemController {
   }
 
   @Delete(':id')
-  @Roles('STOCKMANAGER')
-  @UseGuards(JwtGuard)
   remove(@Param('id') id: string) {
     return this.itemService.remove(id);
   }
