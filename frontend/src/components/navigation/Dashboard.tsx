@@ -93,13 +93,6 @@ export default function Dashboard({ children} : { children: React.ReactNode}) {
                 Gebruikers
               </Link>
               <Link
-                href="#"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-              >
-                <LineChart className="h-4 w-4" />
-                Analytica
-              </Link>
-              <Link
                 href="/vehicles"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
@@ -189,20 +182,6 @@ export default function Dashboard({ children} : { children: React.ReactNode}) {
                 <Users className="h-5 w-5" />
                 Customers
               </Link>
-              <Link
-                href="#"
-                className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
-              >
-                <LineChart className="h-5 w-5" />
-                Analytics
-                </Link>
-              <Link
-                href="/analytica"
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
-              >
-                <LineChart className="h-4 w-4" />
-                Analytica
-             </Link>
             </nav>
           </SheetContent>
         </Sheet>
