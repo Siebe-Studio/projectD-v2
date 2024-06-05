@@ -40,7 +40,7 @@ import { toast } from "sonner";
 
 export type Vehicle = {
   id: number;
-  location_id: number;
+  locationId: number;
   plate: string;
   description: string;
 };
@@ -52,19 +52,25 @@ export const columns: ColumnDef<Vehicle>[] = [
     cell: ({ row }) => <div className="capitalize">{row.getValue("id")}</div>,
   },
   {
-    accessorKey: "location_id",
+    accessorKey: "locationId",
     header: "Locatie ID",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("location_id")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("locationId")}</div>
+    ),
   },
   {
     accessorKey: "plate",
     header: "Kenteken",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("plate")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("plate")}</div>
+    ),
   },
   {
     accessorKey: "description",
     header: "Beschrijving",
-    cell: ({ row }) => <div className="capitalize">{row.getValue("description")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("description")}</div>
+    ),
   },
   {
     id: "actions",
@@ -83,14 +89,17 @@ export const columns: ColumnDef<Vehicle>[] = [
             <DropdownMenuItem
               onClick={async () => {
                 try {
-                  const response = await fetch(`http://localhost:8000/vehicle/${vehicle.id}`, {
-                    method: "DELETE",
-                  });
+                  const response = await fetch(
+                    `http://localhost:8000/vehicle/${vehicle.id}`,
+                    {
+                      method: "DELETE",
+                    }
+                  );
                   if (response.ok) {
                     toast.success("Voertuig verwijderd");
                     setTimeout(() => {
                       window.location.reload();
-                    }, 1500); 
+                    }, 1500);
                   } else {
                     toast.error("Fout bij het verwijderen van voertuig");
                   }
@@ -109,7 +118,13 @@ export const columns: ColumnDef<Vehicle>[] = [
   },
 ];
 
-export function VehicleTable({ data }: { data: Vehicle[] }) {
+export function VehicleTable({
+  data,
+  handleDeleteVehicle,
+}: {
+  data: Vehicle[];
+  handleDeleteVehicle: (vehicle: Vehicle) => void;
+}) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -179,7 +194,12 @@ export function VehicleTable({ data }: { data: Vehicle[] }) {
                 {headerGroup.headers.map((header) => (
                   <TableHead key={header.id}>
                     {header.isPlaceholder ? null : (
-                      <div>{flexRender(header.column.columnDef.header, header.getContext())}</div>
+                      <div>
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      </div>
                     )}
                   </TableHead>
                 ))}
@@ -191,7 +211,12 @@ export function VehicleTable({ data }: { data: Vehicle[] }) {
               table.getRowModel().rows.map((row) => (
                 <TableRow key={row.id}>
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
+                    </TableCell>
                   ))}
                 </TableRow>
               ))

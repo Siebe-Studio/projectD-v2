@@ -14,15 +14,23 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/products/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/products/ui/select";
 import { Input } from "@/components/products/ui/input";
 import { Textarea } from "@/components/products/ui/textarea";
 import { toast } from "sonner";
 
+import type { Vehicle } from "./VehicleTable";
 import React, { useEffect, useState } from "react";
 
 const formSchema = z.object({
-  location_id: z.number({
-    required_error: "Locatie ID is verplicht",
+  locationId: z.coerce.number().int().positive({
+    message: "Locatie is verplicht",
   }),
   plate: z.string().min(2, {
     message: "Kenteken moet minimaal 2 karakters bevatten",
@@ -32,8 +40,12 @@ const formSchema = z.object({
   }),
 });
 
-export default function AddVehicleForm() {
-  const [postVehicle, setPostVehicle] = useState<any>();
+export default function AddVehicleForm({
+  handleAddVehicle,
+}: {
+  handleAddVehicle: (vehicle: Vehicle) => void;
+}) {
+  const [locations, setLocations] = useState<any[]>([]);
 
   const submitVehicle = (values: any) => {
     fetch("http://localhost:8000/vehicle", {
@@ -46,6 +58,12 @@ export default function AddVehicleForm() {
       .then((res) => res.json())
       .then((data) => {
         if (data) {
+          try {
+            handleAddVehicle(data);
+          } catch (e) {
+            console.error(e);
+            toast.error("Voertuig kon niet worden toegevoegd, probeer opnieuw");
+          }
           toast.success("Voertuig toegevoegd");
           console.log(data);
         }
@@ -53,10 +71,27 @@ export default function AddVehicleForm() {
       .catch((error) => console.error(error));
   };
 
+  useEffect(() => {
+    fetch("http://localhost:8000/location", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data) {
+          setLocations(data);
+          console.log(data);
+        }
+      })
+      .catch((error) => console.error(error));
+  }, []);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      location_id: 1,
+      locationId: 0,
       plate: "",
       description: "",
     },
@@ -73,16 +108,23 @@ export default function AddVehicleForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
         <FormField
           control={form.control}
-          name="location_id"
+          name="locationId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Location ID</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  {...field}
-                  onChange={(e) => field.onChange(parseInt(e.target.value))}
-                />
+                <Select onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {locations?.map((location) => (
+                      <SelectItem key={location.id} value={`${location.id}`}>
+                        {location.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormControl>
               <FormMessage />
             </FormItem>

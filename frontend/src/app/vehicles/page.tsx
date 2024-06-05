@@ -10,6 +10,14 @@ export default function Vehicles() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
 
+  function handleAddVehicle(vehicle: any) {
+    setVehicles([...vehicles, vehicle]);
+  }
+
+  function handleDeleteVehicle(vehicle: any) {
+    setVehicles(vehicles.filter((v) => v.id !== vehicle.id));
+  }
+
   useEffect(() => {
     fetch("http://localhost:8000/vehicle", {
       method: "GET",
@@ -36,7 +44,7 @@ export default function Vehicles() {
             <CardTitle>Voertuig toevoegen</CardTitle>
           </CardHeader>
           <CardContent>
-            <AddVehicleDialog />
+            <AddVehicleDialog handleAddVehicle={handleAddVehicle}  />
           </CardContent>
         </Card>
       </div>
@@ -46,7 +54,7 @@ export default function Vehicles() {
           <CardDescription>Overzicht van alle voertuigen</CardDescription>
         </CardHeader>
         <CardContent>
-          <VehicleTable data={vehicles} />
+          <VehicleTable data={vehicles} handleDeleteVehicle={handleDeleteVehicle} />
         </CardContent>
       </Card>
     </main>

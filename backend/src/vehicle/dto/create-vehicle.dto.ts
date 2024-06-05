@@ -4,6 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CreateVehicleDto {
   @ApiProperty()
   @IsInt()
+  @IsOptional()
   id: number;
 
   @ApiProperty()
