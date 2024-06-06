@@ -69,7 +69,7 @@ export default function Dashboard({ children} : { children: React.ReactNode}) {
                 Dashboard
               </Link>
               <Link
-                href="#"
+                href="/preparatie"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
                 <Bus className="h-4 w-4" />

@@ -44,8 +44,11 @@ model Item {
   productId Int
   product   Product @relation(fields: [productId], references: [id])
 
-  locationId Int
-  location   Location  @relation(fields: [locationId], references: [id])
+  vehicleId Int?
+  vehicle   Vehicle? @relation(fields: [vehicleId], references: [id])
+
+  locationId Int?
+  location   Location?  @relation(fields: [locationId], references: [id])
   history    History[]
 }
 
@@ -53,6 +56,8 @@ model Vehicle {
   id          Int     @id @default(autoincrement())
   plate       String
   description String?
+
+  items Item[]
 
   locationId Int
   location   Location @relation(fields: [locationId], references: [id])

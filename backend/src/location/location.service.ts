@@ -5,11 +5,12 @@ import { PrismaService } from 'src/prisma.service';
 export class LocationService {
   constructor(private prisma: PrismaService) {}
 
-  findAll() {
+  findAll(includeVehicles?: boolean) {
     return this.prisma.location.findMany({
       select: {
         id: true,
         name: true,
+        vehicles: includeVehicles,
       }
     });
   }

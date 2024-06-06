@@ -1,4 +1,4 @@
-import { IsString, IsInt, IsOptional } from 'class-validator';
+import { IsString, IsInt, IsOptional, IsArray, isNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateVehicleDto {
@@ -20,3 +20,23 @@ export class CreateVehicleDto {
   @IsInt()
   locationId: number;
 }
+
+export class FillVehicleDto {
+  @ApiProperty()
+  @IsArray()
+  items: ItemDTO[];
+}
+
+
+export class TakeFromVehicleDto {
+  @ApiProperty()
+  @IsArray()
+  items: ItemDTO[];
+}
+
+
+class ItemDTO {
+  @ApiProperty()
+  @IsString()
+  id: string;
+};

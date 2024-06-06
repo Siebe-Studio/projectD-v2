@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, ParseIntPipe, UseGuards } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { VehicleService } from 'src/vehicle/vehicle.service';
-import { CreateVehicleDto } from './dto/create-vehicle.dto';
+import { CreateVehicleDto, FillVehicleDto } from './dto/create-vehicle.dto';
 
 @ApiTags('Vehicle')
 @Controller('vehicle')
@@ -31,5 +31,15 @@ export class VehicleController {
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.vehicleService.remove(id);
+  }
+
+  @Post('fill/:id')
+  async fill(@Param('id', ParseIntPipe) id: number, @Body() data: FillVehicleDto){
+    return this.vehicleService.fill(id, data);
+  }
+
+  @Post('take/:id')
+  async take(@Param('id', ParseIntPipe) id: number, @Body() data: FillVehicleDto){
+    return this.vehicleService.take(id, data);
   }
 }
