@@ -14,9 +14,11 @@ import { ProductModule } from './product/product.module';
 import { VehicleModule } from './vehicle/vehicle.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { HistoryModule } from './history/history.module';
+import { LocationModule } from './location/location.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UserModule, AuthModule, CategoryModule, ItemModule, ProductModule, VehicleModule, DashboardModule, HistoryModule],
+  imports: [ConfigModule.forRoot(), UserModule, AuthModule, CategoryModule, ItemModule, ProductModule, VehicleModule, DashboardModule, HistoryModule, LocationModule],
+
   controllers: [AppController, CategoryController],
   providers: [AppService, PrismaService, JwtService, CategoryService],
 })
