@@ -13,10 +13,12 @@ import { ItemModule } from './item/item.module';
 import { ProductModule } from './product/product.module';
 import { VehicleModule } from './vehicle/vehicle.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { HistoryModule } from './history/history.module';
 import { LocationModule } from './location/location.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), UserModule, AuthModule, CategoryModule, ItemModule, ProductModule, VehicleModule, DashboardModule, LocationModule],
+  imports: [ConfigModule.forRoot(), UserModule, AuthModule, CategoryModule, ItemModule, ProductModule, VehicleModule, DashboardModule, HistoryModule, LocationModule],
+
   controllers: [AppController, CategoryController],
   providers: [AppService, PrismaService, JwtService, CategoryService],
 })
