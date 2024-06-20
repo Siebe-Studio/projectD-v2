@@ -1,7 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query,
+} from '@nestjs/common';
 import { HistoryService } from './history.service';
-import { CreateHistoryDto } from './dto/create-history.dto';
+import { CreateHistoryDto, UpdateHistoryDto } from './dto/create-history.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('history')
 @Controller('history')
 export class HistoryController {
   constructor(private readonly historyService: HistoryService) {}
@@ -12,8 +23,8 @@ export class HistoryController {
   }
 
   @Get()
-  findAll() {
-    return this.historyService.findAll();
+  findAll(@Query('item') includeItem: boolean) {
+    return this.historyService.findAll(includeItem);
   }
 
   @Get(':id')
@@ -22,8 +33,8 @@ export class HistoryController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string) {
-    return this.historyService.update(+id);
+  update(@Param('id') id: string, @Body() dto: UpdateHistoryDto) {
+    return this.historyService.update(+id, dto);
   }
 
   @Delete(':id')
